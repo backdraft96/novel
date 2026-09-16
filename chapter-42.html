@@ -65,6 +65,14 @@
       min-height: 100vh;
     }
 
+    /* 본문 서체 전환 보장 (Tailwind font-serif 오버라이드) */
+    .novel-text {
+      font-family: var(--active-font) !important;
+    }
+    body.font-mode-sans, body.font-mode-sans .novel-text, body.font-mode-sans h2 {
+      font-family: var(--font-family-sans) !important;
+    }
+
     .novel-text p {
       text-indent: 1.25em;
       margin-bottom: 1.25rem;
@@ -135,73 +143,169 @@
       border-top: 1px solid rgba(197, 160, 89, 0.3);
     }
 
-    /* 플로팅 내비게이션 독 래퍼 & 스마트 반투명/호버 효과 */
-    .float-dock-wrapper {
+    /* 하단 통합 단일 플로팅 독 (스마트폰 화면 비율 반응형 최적화) */
+    .bottom-float-dock-wrapper {
       position: fixed;
-      top: 50%;
-      transform: translateY(-50%);
+      bottom: max(12px, env(safe-area-inset-bottom, 12px));
+      left: 50%;
+      transform: translateX(-50%);
       z-index: 45;
-      transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1), transform 0.3s ease, filter 0.3s ease;
-      will-change: opacity, transform;
-    }
-
-    .float-dock-wrapper.dock-left {
-      left: 14px;
-    }
-
-    .float-dock-wrapper.dock-right {
-      right: 14px;
-    }
-
-    /* 기본 상태: 은은한 85% 가시성 유지 */
-    .float-dock-wrapper {
-      opacity: 0.85;
-    }
-    .float-dock-wrapper:hover {
-      opacity: 1;
-      transform: translateY(-50%) scale(1.03);
-    }
-
-    /* 책 본문 영역 안으로 겹쳤을 때: 독서 집중을 위해 반투명 모드로 자동 전환 */
-    .float-dock-wrapper.overlap-mode {
-      opacity: 0.15;
-      filter: grayscale(40%);
-    }
-
-    /* 반투명 모드에서 마우스가 다가가거나 터치/포커스 시 선명하게 복귀 */
-    .float-dock-wrapper.overlap-mode:hover,
-    .float-dock-wrapper.overlap-mode:focus-within,
-    .float-dock-wrapper.overlap-mode.touch-active {
+      width: calc(100% - 16px);
+      max-width: 600px;
       opacity: 1 !important;
-      filter: none !important;
-      transform: translateY(-50%) scale(1.04);
-      box-shadow: 0 18px 40px -6px rgba(0, 0, 0, 0.28);
+      visibility: visible !important;
+      user-select: none;
+      -webkit-user-select: none;
     }
 
-    .adjacent-float-dock {
+    .bottom-float-dock {
       background-color: var(--float-bg);
-      backdrop-filter: blur(14px);
-      border: 1px solid var(--float-border);
-      box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.18);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1.5px solid var(--float-border);
+      box-shadow: 0 12px 36px -6px rgba(0, 0, 0, 0.28), 0 4px 12px rgba(0, 0, 0, 0.08);
+      border-radius: 20px;
+      padding: 5px 3px;
     }
 
-    .adjacent-menu-btn {
+    .dock-btn {
       background-color: transparent;
       color: var(--text-color);
-      transition: all 0.2s ease;
+      transition: all 0.16s ease;
       text-decoration: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 7px 2px;
+      border-radius: 14px;
+      flex: 1 1 0px;
+      min-width: 0;
+      min-height: 52px;
+      position: relative;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
     }
 
-    .adjacent-menu-btn:hover:not(.disabled) {
+    .dock-btn:active {
+      transform: scale(0.92);
+      background-color: rgba(30, 58, 95, 0.15);
+    }
+
+    .dock-btn:hover:not(.disabled) {
       background-color: var(--accent);
       color: #ffffff;
-      transform: translateY(-2px);
     }
 
-    .adjacent-menu-btn.disabled {
+    .dock-icon {
+      font-size: 1.25rem;
+      line-height: 1;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 3px;
+    }
+
+    .dock-label {
+      font-size: 10.5px;
+      font-weight: 600;
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 100%;
+    }
+
+    /* 화면 폭에 따른 유동적 버튼 & 글자 크기 스케일링 */
+    @media (min-width: 480px) {
+      .bottom-float-dock {
+        padding: 7px 6px;
+      }
+      .dock-btn {
+        padding: 8px 4px;
+        min-height: 56px;
+      }
+      .dock-icon {
+        font-size: 1.35rem;
+      }
+      .dock-label {
+        font-size: 11.5px;
+      }
+    }
+
+    @media (max-width: 375px) {
+      .bottom-float-dock-wrapper {
+        width: calc(100% - 10px);
+        bottom: max(8px, env(safe-area-inset-bottom, 8px));
+      }
+      .bottom-float-dock {
+        padding: 4px 1px;
+      }
+      .dock-btn {
+        padding: 6px 1px;
+        min-height: 48px;
+        border-radius: 11px;
+      }
+      .dock-icon {
+        font-size: 1.15rem;
+        margin-bottom: 2px;
+      }
+      .dock-label {
+        font-size: 9.5px;
+        letter-spacing: -0.05em;
+      }
+    }
+
+    .dock-btn.disabled {
       opacity: 0.35;
       cursor: not-allowed;
       pointer-events: none;
+    }
+
+    .dock-btn.active-bookmark {
+      color: #e11d48;
+      font-weight: 700;
+    }
+
+    /* 시각적 책갈피 리본 띠 */
+    .bookmark-ribbon {
+      position: absolute;
+      top: -6px;
+      right: 28px;
+      width: 32px;
+      height: 48px;
+      background: #e11d48;
+      box-shadow: 0 4px 10px rgba(225, 29, 72, 0.35);
+      clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 80%, 0 100%);
+      z-index: 30;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 14px;
+      animation: ribbonBounce 0.4s ease-out;
+    }
+
+    @keyframes ribbonBounce {
+      0% { transform: translateY(-20px); opacity: 0; }
+      70% { transform: translateY(3px); }
+      100% { transform: translateY(0); opacity: 1; }
+    }
+
+    /* 테마 선택 팝오버 메뉴 (모바일 화면 중앙 정렬로 잘림 방지) */
+    #theme-popover {
+      position: absolute;
+      bottom: calc(100% + 12px);
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: var(--card-bg);
+      border: 1px solid var(--border-color);
+      box-shadow: 0 16px 40px -4px rgba(0, 0, 0, 0.28);
+      border-radius: 18px;
+      padding: 14px;
+      width: min(290px, calc(100vw - 32px));
+      z-index: 55;
     }
   </style>
 </head>
@@ -219,7 +323,7 @@
       </button>
       <a href="cover.html" class="flex items-center gap-2 cursor-pointer group no-underline text-inherit" title="표지로 이동">
         <span class="font-bold text-lg tracking-tight group-hover:text-[var(--accent)] transition-colors">댐</span>
-        <span class="text-xs bg-[var(--accent)] text-white px-2 py-0.5 rounded font-normal">윤인</span>
+        <span class="text-xs bg-[var(--accent)] text-white px-2 py-0.5 rounded font-normal">윤인 원작 극본 댐 소설화</span>
       </a>
     </div>
 
@@ -229,8 +333,8 @@
 
     <div class="flex items-center gap-1 sm:gap-2">
       <button id="btn-bookmark" class="p-2 rounded-lg hover:bg-[var(--border-color)] text-sm transition-colors flex items-center gap-1" title="현재 장 책갈피">
-        <span>🔖</span>
-        <span class="text-xs hidden sm:inline">책갈피</span>
+        <span id="header-bookmark-icon">🔖</span>
+        <span id="header-bookmark-text" class="text-xs hidden sm:inline">책갈피</span>
       </button>
       <button id="btn-toggle-settings" class="p-2 rounded-lg hover:bg-[var(--border-color)] text-sm transition-colors flex items-center gap-1" title="독서 환경 설정">
         <span>⚙️</span>
@@ -238,6 +342,17 @@
       </button>
     </div>
   </header>
+
+  <!-- 책갈피 알림 배너 (저장된 위치 안내) -->
+  <div id="bookmark-banner" class="fixed top-14 left-0 right-0 bg-amber-500/10 border-b border-amber-500/30 text-[var(--text-color)] px-4 py-2 z-35 flex items-center justify-between text-xs hidden backdrop-blur-md">
+    <div class="flex items-center gap-2">
+      <span class="text-rose-600 font-bold">🔖 최근 책갈피 기록:</span>
+      <span id="bookmark-banner-info" class="font-medium text-slate-700">기록 없음</span>
+    </div>
+    <button id="btn-goto-bookmark" class="px-2.5 py-0.5 bg-rose-600 hover:bg-rose-700 text-white rounded font-semibold text-[11px] transition-colors">
+      그 위치로 스크롤
+    </button>
+  </div>
 
   <!-- Settings Dropdown -->
   <div id="settings-dropdown" class="fixed top-16 right-4 w-72 bg-[var(--card-bg)] border border-[var(--border-color)] rounded-2xl p-4 shadow-2xl z-50 hidden font-sans">
@@ -262,7 +377,7 @@
     <div>
       <label class="text-xs font-bold text-[var(--text-muted)] block mb-2 uppercase tracking-wider">서체 스타일</label>
       <div class="grid grid-cols-2 gap-2 text-center text-xs">
-        <button id="font-btn-serif" class="py-2 rounded-lg border border-[var(--border-color)] font-serif font-bold">명조체</button>
+        <button id="font-btn-serif" class="py-2 rounded-lg border border-indigo-600 bg-indigo-50/50 text-indigo-700 font-serif font-bold">명조체</button>
         <button id="font-btn-sans" class="py-2 rounded-lg border border-[var(--border-color)] font-sans">고딕체</button>
       </div>
     </div>
@@ -660,442 +775,430 @@
           </a>
         
           <a href="chapter-95.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
-            4
-          </a>
-        
-          <a href="chapter-96.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
             제94장 꿈에 본 마을
           </a>
         
-          <a href="chapter-97.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
+          <a href="chapter-96.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
             제95장 아이의 사진
           </a>
         
-          <a href="chapter-98.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
+          <a href="chapter-97.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
             제96장 상여 나가는 날
           </a>
         
-          <a href="chapter-99.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
+          <a href="chapter-98.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
             제97장 공장을 내놓다
           </a>
         
-          <a href="chapter-100.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
+          <a href="chapter-99.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
             제98장 눈 내린 겨울
           </a>
         
-          <a href="chapter-101.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
+          <a href="chapter-100.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
             제99장 봄을 기다리는 사람들
           </a>
         
-          <a href="chapter-102.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
+          <a href="chapter-101.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
             제100장 물 건너의 꿈
           </a>
         
-          <a href="chapter-103.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
+          <a href="chapter-102.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
             제101장 열매 따는 사람
           </a>
         
-          <a href="chapter-104.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
+          <a href="chapter-103.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
             제102장 마른땅에 내린 비
           </a>
         
-          <a href="chapter-105.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
+          <a href="chapter-104.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
             제103장 진짜 털보아저씨
           </a>
         
-          <a href="chapter-106.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
+          <a href="chapter-105.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
             제104장 공장을 판 날
           </a>
         
-          <a href="chapter-107.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
+          <a href="chapter-106.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
             제105장 이국의 혼례
           </a>
         
-          <a href="chapter-108.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
+          <a href="chapter-107.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
             제106장 주인이 바뀌다
           </a>
         
-          <a href="chapter-109.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
+          <a href="chapter-108.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
             제107장 생존권을 돌려 달라
           </a>
         
-          <a href="chapter-110.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
+          <a href="chapter-109.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
             제108장 숲에 내린 소나기
           </a>
         
-          <a href="chapter-111.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
+          <a href="chapter-110.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
             제109장 팔리지 않는 나무
           </a>
         
-          <a href="chapter-112.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
+          <a href="chapter-111.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
             제110장 나무가 팔려 나가다
           </a>
         
-          <a href="chapter-113.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
+          <a href="chapter-112.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
             제111장 고인돌 앞의 혼례
           </a>
         
-          <a href="chapter-114.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
+          <a href="chapter-113.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
             제112장 부결된 투표
           </a>
         
-          <a href="chapter-115.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
+          <a href="chapter-114.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
             제113장 국그릇과 묘목
           </a>
         
-          <a href="chapter-116.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
+          <a href="chapter-115.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
             제114장 타국에서 부르는 고향
           </a>
         
-          <a href="chapter-117.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
+          <a href="chapter-116.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
             제115장 돌아온 사람
           </a>
         
-          <a href="chapter-118.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
+          <a href="chapter-117.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
             제116장 마을에 도는 소식
           </a>
         
-          <a href="chapter-119.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
+          <a href="chapter-118.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
             제117장 옹벽이 다 올라간 날
           </a>
         
-          <a href="chapter-120.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
+          <a href="chapter-119.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
             제118장 교회 입당하는 날
           </a>
         
-          <a href="chapter-121.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
+          <a href="chapter-120.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
             제119장 땅을 내놓다
           </a>
         
-          <a href="chapter-122.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
+          <a href="chapter-121.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
             제120장 낙찰과 실종
           </a>
         
-          <a href="chapter-123.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
+          <a href="chapter-122.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
             제121장 옹벽 위의 결혼식
           </a>
         
-          <a href="chapter-124.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
+          <a href="chapter-123.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
             제122장 습지를 두고 다투다
           </a>
         
-          <a href="chapter-125.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
+          <a href="chapter-124.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
             제123장 발열감시카메라
           </a>
         
-          <a href="chapter-126.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
+          <a href="chapter-125.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
             제124장 거푸집이 터지던 날
           </a>
         
-          <a href="chapter-127.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
+          <a href="chapter-126.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
             제125장 무대의 불이 꺼지고
           </a>
         
-          <a href="chapter-128.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
+          <a href="chapter-127.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
             제126장 비 오는 날의 비닐하우스
           </a>
         
-          <a href="chapter-129.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
+          <a href="chapter-128.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
             제127장 은인을 찾아서
           </a>
         
-          <a href="chapter-130.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
+          <a href="chapter-129.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
             제128장 하늘에서 내려다본 땅
           </a>
         
-          <a href="chapter-131.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
+          <a href="chapter-130.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
             제129장 돌아온 자리
           </a>
         
-          <a href="chapter-132.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
+          <a href="chapter-131.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
             제130장 억새골이 헐리던 날
           </a>
         
-          <a href="chapter-133.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
+          <a href="chapter-132.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
             제131장 그릇을 파는 사람들
           </a>
         
-          <a href="chapter-134.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
+          <a href="chapter-133.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
             제132장 딸을 위한 잔치
           </a>
         
-          <a href="chapter-135.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
+          <a href="chapter-134.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
             제133장 남의 땅에 지은 집
           </a>
         
-          <a href="chapter-136.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
+          <a href="chapter-135.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
             제134장 아버지가 된 사람
           </a>
         
-          <a href="chapter-137.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
+          <a href="chapter-136.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
             제135장 반값에 산 집
           </a>
         
-          <a href="chapter-138.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
+          <a href="chapter-137.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
             제136장 보건소가 서던 날
           </a>
         
-          <a href="chapter-139.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
+          <a href="chapter-138.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
             제137장 트랙터를 배우다
           </a>
         
-          <a href="chapter-140.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
-            10
-          </a>
-        
-          <a href="chapter-141.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
+          <a href="chapter-139.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
             제138장 마을로 오는 사업
           </a>
         
-          <a href="chapter-142.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
+          <a href="chapter-140.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
             제139장 고백과 심방
           </a>
         
-          <a href="chapter-143.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
+          <a href="chapter-141.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
             제140장 남대문의 옷가게
           </a>
         
-          <a href="chapter-144.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
+          <a href="chapter-142.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
             제141장 산 위의 합동추모
           </a>
         
-          <a href="chapter-145.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
+          <a href="chapter-143.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
             제142장 갚아야 할 몫
           </a>
         
-          <a href="chapter-146.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
+          <a href="chapter-144.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
             제143장 구조조정과 혼례
           </a>
         
-          <a href="chapter-147.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
+          <a href="chapter-145.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
             제144장 미국에서 만난 사람들
           </a>
         
-          <a href="chapter-148.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
+          <a href="chapter-146.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
             제145장 옛집을 사다
           </a>
         
-          <a href="chapter-149.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
+          <a href="chapter-147.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
             제146장 아버지가 보여준 것
           </a>
         
-          <a href="chapter-150.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
-            11
-          </a>
-        
-          <a href="chapter-151.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
+          <a href="chapter-148.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
             제147장 땅속에서 나온 것들
           </a>
         
-          <a href="chapter-152.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
+          <a href="chapter-149.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
             제148장 남겨진 자리
           </a>
         
-          <a href="chapter-153.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
+          <a href="chapter-150.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
             제149장 눈 내리는 겨울
           </a>
         
-          <a href="chapter-154.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
+          <a href="chapter-151.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
             제150장 겨울을 나는 사람들
           </a>
         
-          <a href="chapter-155.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
+          <a href="chapter-152.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
             제151장 봄이 오는 소리
           </a>
         
-          <a href="chapter-156.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
+          <a href="chapter-153.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
             제152장 기공식
           </a>
         
-          <a href="chapter-157.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
+          <a href="chapter-154.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
             제153장 두 사람의 출마
           </a>
         
-          <a href="chapter-158.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
+          <a href="chapter-155.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
             제154장 연상의 신부
           </a>
         
-          <a href="chapter-159.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
+          <a href="chapter-156.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
             제155장 돌아온 사람들
           </a>
         
-          <a href="chapter-160.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
+          <a href="chapter-157.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
             제156장 배구 시합
           </a>
         
-          <a href="chapter-161.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
+          <a href="chapter-158.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
             제157장 새 땅을 찾다
           </a>
         
-          <a href="chapter-162.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
+          <a href="chapter-159.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
             제158장 먼 나라에서 온 후예들
           </a>
         
-          <a href="chapter-163.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
+          <a href="chapter-160.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
             제159장 태평양을 건너온 아기
           </a>
         
-          <a href="chapter-164.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
+          <a href="chapter-161.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
             제160장 빼앗긴 밥집
           </a>
         
-          <a href="chapter-165.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
+          <a href="chapter-162.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
             제161장 새벽에 오르는 사람들
           </a>
         
-          <a href="chapter-166.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
+          <a href="chapter-163.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
             제162장 끈 떨어진 연
           </a>
         
-          <a href="chapter-167.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
+          <a href="chapter-164.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
             제163장 내려놓은 것들
           </a>
         
-          <a href="chapter-168.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
+          <a href="chapter-165.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
             제164장 빈손
           </a>
         
-          <a href="chapter-169.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
+          <a href="chapter-166.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
             제165장 수염을 깎는 꿈
           </a>
         
-          <a href="chapter-170.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
+          <a href="chapter-167.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
             제166장 천막식당이 사라진 자리
           </a>
         
-          <a href="chapter-171.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
+          <a href="chapter-168.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
             제167장 교회 뒷마당의 공사판
           </a>
         
-          <a href="chapter-172.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
+          <a href="chapter-169.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
             제168장 그 집을 헐던 사람
           </a>
         
-          <a href="chapter-173.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
+          <a href="chapter-170.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
             제169장 굴러들어온 복
           </a>
         
-          <a href="chapter-174.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
+          <a href="chapter-171.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
             제170장 아버지의 생일
           </a>
         
-          <a href="chapter-175.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
+          <a href="chapter-172.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
             제171장 들어오는 사람 나가는 사람
           </a>
         
-          <a href="chapter-176.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
+          <a href="chapter-173.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
             제172장 새 땅 위의 첫 농사
           </a>
         
-          <a href="chapter-177.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
+          <a href="chapter-174.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
             제173장 철원으로 가는 길
           </a>
         
-          <a href="chapter-178.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
+          <a href="chapter-175.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
             제174장 거저 받았으니 거저 주라
           </a>
         
-          <a href="chapter-179.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
+          <a href="chapter-176.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
             제175장 밝혀진 아이
           </a>
         
-          <a href="chapter-180.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
+          <a href="chapter-177.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
             제176장 완치 통보
           </a>
         
-          <a href="chapter-181.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
+          <a href="chapter-178.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
             제177장 다시 찾은 교회
           </a>
         
-          <a href="chapter-182.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
+          <a href="chapter-179.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
             제178장 눈 내리는 마을
           </a>
         
-          <a href="chapter-183.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
+          <a href="chapter-180.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
             제179장 정배의 생일
           </a>
         
-          <a href="chapter-184.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
+          <a href="chapter-181.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
             제180장 재롱잔치
           </a>
         
-          <a href="chapter-185.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
+          <a href="chapter-182.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
             제181장 댐이 간판을 달다
           </a>
         
-          <a href="chapter-186.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
+          <a href="chapter-183.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
             제182장 철원으로 가는 짐
           </a>
         
-          <a href="chapter-187.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
+          <a href="chapter-184.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
             제183장 돌아온 선물
           </a>
         
-          <a href="chapter-188.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
+          <a href="chapter-185.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
             제184장 달란트
           </a>
         
-          <a href="chapter-189.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
+          <a href="chapter-186.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
             제185장 등잔 밑
           </a>
         
-          <a href="chapter-190.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
+          <a href="chapter-187.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
             제186장 폐교 뒤뜰
           </a>
         
-          <a href="chapter-191.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
+          <a href="chapter-188.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
             제187장 아버지의 봉투
           </a>
         
-          <a href="chapter-192.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
+          <a href="chapter-189.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
             제188장 범람
           </a>
         
-          <a href="chapter-193.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
+          <a href="chapter-190.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
             제189장 재경 산수마을 사람들
           </a>
         
-          <a href="chapter-194.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
+          <a href="chapter-191.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
             제190장 나를 살린 사람들
           </a>
         
-          <a href="chapter-195.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
+          <a href="chapter-192.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
             제191장 개가 잡은 사람
           </a>
         
-          <a href="chapter-196.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
+          <a href="chapter-193.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
             제192장 항상 기뻐하라
           </a>
         
-          <a href="chapter-197.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
+          <a href="chapter-194.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
             제193장 판이 나오다
           </a>
         
-          <a href="chapter-198.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
+          <a href="chapter-195.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
             제194장 짝을 찾다
           </a>
         
-          <a href="chapter-199.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
+          <a href="chapter-196.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
             제195장 마을이 보낸 나들이
           </a>
         
-          <a href="chapter-200.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
+          <a href="chapter-197.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
             제196장 지극히 작은 자 하나에게
           </a>
         
-          <a href="chapter-201.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
+          <a href="chapter-198.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
             제197장 부름 받아 나선 이 몸
           </a>
         
-          <a href="chapter-202.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
+          <a href="chapter-199.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
             제198장 물은 생명이다
           </a>
         
-          <a href="chapter-203.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
+          <a href="chapter-200.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
             제199장 순교
           </a>
         
-          <a href="chapter-204.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
+          <a href="chapter-201.html" class="block px-3 py-2 text-xs rounded-lg transition-colors truncate hover:bg-[var(--card-bg)] text-[var(--text-color)]">
             제200장 물에 잠긴 마을
           </a>
         
@@ -1103,457 +1206,488 @@
   </aside>
   <div id="sidebar-overlay" class="fixed inset-0 top-14 bg-black/40 z-30 hidden"></div>
 
-  <!-- Left Floating Navigation Dock (Fixed Viewport) -->
-  <aside id="dock-left-wrapper" class="float-dock-wrapper dock-left font-sans" title="좌측 내비게이션 (마우스를 올리면 선명해집니다)">
-    <div class="adjacent-float-dock rounded-2xl p-1.5 flex flex-col gap-1.5 text-center shadow-xl">
-      <a href="cover.html" class="adjacent-menu-btn w-12 h-12 rounded-xl flex flex-col items-center justify-center p-1" title="표지로">
-        <span class="text-base leading-none">🏠</span>
-        <span class="text-[10px] font-medium leading-tight mt-1">표지</span>
+  <!-- 하단 단일 플로팅 독 (항상 상시 표시) -->
+  <aside id="dock-bottom-wrapper" class="bottom-float-dock-wrapper font-sans" title="하단 메뉴 바">
+    
+    <!-- 화면 스타일 테마 팝오버 -->
+    <div id="theme-popover" class="hidden font-sans">
+      <div class="text-[11px] font-bold text-[var(--text-muted)] uppercase tracking-wider mb-2">독서 테마 선택</div>
+      <div class="grid grid-cols-3 gap-1.5 text-center text-xs font-semibold mb-3">
+        <button class="theme-btn py-1.5 rounded-lg border border-slate-200 bg-stone-50 text-stone-900" data-theme="light">라이트</button>
+        <button class="theme-btn py-1.5 rounded-lg border border-amber-200 bg-[#f4ecd8] text-[#433422]" data-theme="sepia">세피아</button>
+        <button class="theme-btn py-1.5 rounded-lg border border-zinc-700 bg-zinc-900 text-zinc-200" data-theme="dark">다크</button>
+      </div>
+      <div class="text-[11px] font-bold text-[var(--text-muted)] uppercase tracking-wider mb-1.5">서체 선택</div>
+      <div class="grid grid-cols-2 gap-1.5 text-center text-xs">
+        <button id="popover-font-serif" class="py-1.5 rounded-md border border-indigo-600 bg-indigo-50/50 text-indigo-700 font-serif font-bold">명조체</button>
+        <button id="popover-font-sans" class="py-1.5 rounded-md border border-[var(--border-color)] font-sans">고딕체</button>
+      </div>
+    </div>
+
+    <div class="bottom-float-dock flex items-center justify-between shadow-2xl">
+      
+      <!-- 1. 처음으로 -->
+      <a href="cover.html" class="dock-btn" title="처음으로 (표지)">
+        <span class="dock-icon">🏠</span>
+        <span class="dock-label">처음으로</span>
       </a>
-      <button id="float-btn-toc" class="adjacent-menu-btn w-12 h-12 rounded-xl flex flex-col items-center justify-center p-1" title="목차">
-        <span class="text-base leading-none">☰</span>
-        <span class="text-[10px] font-medium leading-tight mt-1">목차</span>
+
+      <!-- 2. 목차 -->
+      <button id="float-btn-toc" class="dock-btn" title="전체 목차">
+        <span class="dock-icon">☰</span>
+        <span class="dock-label">목차</span>
       </button>
-      <a href="chapter-41.html" class="adjacent-menu-btn w-12 h-12 rounded-xl flex flex-col items-center justify-center p-1 " title="이전 장: 제40장 접는 것들">
-        <span class="text-base leading-none">◀</span>
-        <span class="text-[10px] font-medium leading-tight mt-1">이전장</span>
+
+      <!-- 3. 이전장 -->
+      <a href="chapter-41.html" class="dock-btn " title="이전 장: 제40장 접는 것들">
+        <span class="dock-icon">◀</span>
+        <span class="dock-label">이전장</span>
       </a>
+
+      <!-- 4. 다음장 -->
+      <a href="chapter-43.html" class="dock-btn " title="다음 장: 제42장 닷새">
+        <span class="dock-icon">▶</span>
+        <span class="dock-label">다음장</span>
+      </a>
+
+      <!-- 5. 글꼴 크기 크게 -->
+      <button id="float-btn-font-plus" class="dock-btn" title="글꼴 크기 확대 (A+)">
+        <span class="dock-icon font-black text-sm">A+</span>
+        <span class="dock-label">크게</span>
+      </button>
+
+      <!-- 6. 글꼴 크기 작게 -->
+      <button id="float-btn-font-minus" class="dock-btn" title="글꼴 크기 축소 (A-)">
+        <span class="dock-icon font-black text-sm">A-</span>
+        <span class="dock-label">작게</span>
+      </button>
+
+      <!-- 7. 화면 스타일 -->
+      <button id="float-btn-theme" class="dock-btn relative" title="화면 스타일 (테마/서체)">
+        <span class="dock-icon">🎨</span>
+        <span class="dock-label">스타일</span>
+      </button>
+
+      <!-- 8. 책갈피 -->
+      <button id="float-btn-bookmark" class="dock-btn" title="현재 위치 책갈피">
+        <span id="dock-bookmark-icon" class="dock-icon">🔖</span>
+        <span class="dock-label">책갈피</span>
+      </button>
+
     </div>
   </aside>
 
-  <!-- Right Floating Navigation Dock (Fixed Viewport) -->
-  <aside id="dock-right-wrapper" class="float-dock-wrapper dock-right font-sans" title="우측 도구함 (마우스를 올리면 선명해집니다)">
-    <div class="adjacent-float-dock rounded-2xl p-1.5 flex flex-col gap-1.5 text-center shadow-xl">
-      <a href="chapter-43.html" class="adjacent-menu-btn w-12 h-12 rounded-xl flex flex-col items-center justify-center p-1 " title="다음 장: 제42장 닷새">
-        <span class="text-base leading-none">▶</span>
-        <span class="text-[10px] font-medium leading-tight mt-1">다음장</span>
-      </a>
-      <button id="float-btn-bookmark" class="adjacent-menu-btn w-12 h-12 rounded-xl flex flex-col items-center justify-center p-1" title="책갈피">
-        <span class="text-base leading-none">🔖</span>
-        <span class="text-[10px] font-medium leading-tight mt-1">책갈피</span>
-      </button>
-      <button id="float-btn-settings" class="adjacent-menu-btn w-12 h-12 rounded-xl flex flex-col items-center justify-center p-1" title="설정">
-        <span class="text-base leading-none">⚙️</span>
-        <span class="text-[10px] font-medium leading-tight mt-1">설정</span>
-      </button>
-      <button id="float-btn-top" class="adjacent-menu-btn w-12 h-12 rounded-xl flex flex-col items-center justify-center p-1 border-t border-[var(--border-color)] pt-1.5" title="맨 위로">
-        <span class="text-base leading-none">▲</span>
-        <span class="text-[10px] font-medium leading-tight mt-1">위로</span>
-      </button>
-    </div>
-  </aside>
-
-  <main class="pt-14 pb-20 px-3 sm:px-6 flex justify-center min-h-screen relative">
+  <main class="pt-14 pb-32 sm:pb-36 px-3 sm:px-6 flex justify-center min-h-screen relative">
     <div class="relative w-full max-w-2xl my-6">
 
       <!-- Book Viewport -->
-      <article id="reader-viewport" class="w-full bg-[var(--card-bg)] border border-[var(--border-color)] rounded-2xl p-6 sm:p-12 shadow-sm transition-all duration-200">
+      <article id="reader-viewport" class="w-full bg-[var(--card-bg)] border border-[var(--border-color)] rounded-2xl p-6 sm:p-12 shadow-sm transition-all duration-200 relative">
+        <!-- 책갈피 시각 리본 마커 -->
+        <div id="visual-bookmark-ribbon" class="bookmark-ribbon hidden" title="책갈피 표시">🔖</div>
         
         <div class="source-section" data-type="chapter" data-title="제41장 도망간 사람">
           <span class="text-xs font-sans font-bold uppercase tracking-widest text-[var(--accent)] block mb-2">제41장 도망간 사람</span>
           <h2 class="text-2xl font-bold font-serif mb-8 pb-3 border-b border-[var(--border-color)]">제41장 도망간 사람</h2>
           <div class="novel-text font-serif leading-relaxed">
-            
-              <p>1</p>
-<p>삼 층 콘크리트 건물인 댐 숙소, 외벽에는 도비작업이 되어 있고 현관 앞마당에는 자갈이 산더미처럼 쌓여 있었다. 그 자갈 둘레 몇 군데에 다이를 놓았고, 일꾼들이 그 위에 질통을 올려놓고 삽으로 자갈을 퍼 담았다. 자갈이 가득 담긴 질통을 등에 메고 건물 안으로 들어가 계단을 올랐다. 전등불이 환히 켜진 방 안에서 엑셀호수가 깔린 바닥에 자갈을 쏟아 부으면, 또 다른 일꾼이 호바로 그 자갈을 호수 위에 잘 덮었다. 덤프트럭이 와서 자갈을 또 쏟아 붓고 갔다.</p>
-<p>덕배가 질통에 자갈을 담는 일꾼에게 말을 걸었다.</p>
-<p class="dialogue">"배씨, 힘들어?"</p>
-<p class="dialogue">"네. 힘들어요."</p>
-<p class="dialogue">"음료수 좀 먹고 하지?"</p>
-<p class="dialogue">"네."</p>
-<p>배씨가 수건으로 땀을 닦고 음료수를 마셨다.</p>
-<p class="dialogue">"곰빵 할 만해?"</p>
-<p>배씨가 고개를 가로저었다.</p>
-<p class="dialogue">"남들은 그 무거운 벽돌지게도 하루 종일 지고, 또 그 다음 그 다음 날에도 지더구먼."</p>
-<p class="dialogue">"사장님 나, 내일부터는 이 곰빵 일 안 할래요?"</p>
-<p class="dialogue">"왜?"</p>
-<p class="dialogue">"너무 힘들어요."</p>
-<p class="dialogue">"힘 있을 때 해요! 이 일, 딴 일 하는 거보다 간섭도 안 받고 돈도 많잖아?"</p>
-<p class="dialogue">"……."</p>
-<p class="dialogue">"한 살이라도 더 젊었을 때 해! 나이 먹으면 하고 싶어도 남들이 시키지도 않아요. 좀 좋지 않은 일도 해줘야지, 좋은 일 나왔을 때 그 일도 내보내주고 그러지. 그게 인지상정 아닌가?"</p>
-<p>배씨가 무표정하게 고개만 끄덕였다.</p>
-<p>방 안에서는 한선구가 올라온 자갈을 미장하기 좋도록 펴는 작업을 하고 있었다. 마을 사람 하나가 들여다보았다.</p>
-<p class="dialogue">"아저씨, 안녕하세요?"</p>
-<p class="dialogue">"네."</p>
-<p class="dialogue">"난방시설 꼼꼼하게 잘 하십니다."</p>
-<p class="dialogue">"네. 이렇게 해야만 겨울에 춥지 않아요."</p>
-<p class="dialogue">"시공이 너무 간편하고 효율적입니다. 그래서 우리 집도 곧 수리하려고 합니다."</p>
-<p class="dialogue">"집수리해서 사용하시면 넓고 편리해서 좋습니다."</p>
-<p class="dialogue">"아저씨, 집수리도 하나요?"</p>
-<p class="dialogue">"그럼요."</p>
-<p class="dialogue">"인테리어도?"</p>
-<p class="dialogue">"네. 저, 집수리가 전문인걸요."</p>
-<p class="dialogue">"마침 잘 만났네요. 그동안 집수리를 하려고 해도 잘 한다는 사람 못 만났었거든요. 베란다 뜯어서 거실 확장하고, 다락 딸린 부엌 부숴서 방 하나 더 만들려고 합니다."</p>
-<p class="dialogue">"그러면 좋지요. 제가 그런 거 하는 기계, 도구들을 다 갖고 있거든요."</p>
-<p class="dialogue">"그럼 우리 집, 수리 좀 부탁합니다. 우리 집은 이 댐으로 흘러들어오는 강 초입에 있습니다."</p>
-<p class="dialogue">"고맙습니다."</p>
-<p>한선구가 주머니에서 명함을 꺼내주었다.</p>
-<p>창문 밖으로 댐 물막이 공사장의 웅장한 옹벽이 보이는 자리에서, 덕배와 주승호가 아래쪽에서 자갈 곰빵을 하는 일꾼들을 내려다보았다.</p>
-<p class="dialogue">"왜 저 자갈, 하이랜드로 올리지 않고……. 힘들고 시간 걸리지 않습니까?"</p>
-<p class="dialogue">"하이랜드로 올리면 좋지요. 그렇지만 그렇게 장비를 이용하게 되면 저 곰빵 일 하는 사람들, 일거리가 없습니다."</p>
-<p class="dialogue">"네?"</p>
-<p class="dialogue">"그리고 또 이중일이 됩니다. 한곳에 쌓인 자갈을 각 방으로 옮겨놔야 되잖겠습니까?"</p>
-<p class="dialogue">"일이 너무 늦어지는 거 같습니다. 그럼 미장도 기계미장 안 할 겁니까? 손 미장을 할 겁니까?"</p>
-<p class="dialogue">"그건 기계미장 해야지요. 원래는 미장도 인력으로 하려고 시멘트 모래 준비했었지만, 지하실에 큰 보일러 제작 설치하는 바람에 그만 공기에 쫓기게 돼서……."</p>
-<p class="dialogue">"그건 어쩔 수 없는 일 아닙니까? 숙소 사람들, 더운 물 쓰려면 보일러 설치는 당연한 일이지요."</p>
-<p class="dialogue">"……."</p>
-<p class="dialogue">"그럼, 쓰지 않는 저 모래 시멘트는 어떡할 겁니까?"</p>
-<p class="dialogue">"기계미장해서 일만 빨리 끝마쳐준다면, 이 현장에서 모래 시멘트 다 쓴다고 합니다."</p>
-<p class="dialogue">"누가 그럽니까?"</p>
-<p class="dialogue">"저번에 박과장님과 말씀 나눴습니다."</p>
-<p>주승호가 고개를 끄덕였다.</p>
-<p class="dialogue">"어쨌든 일만 잘 마무리 지어 주세요."</p>
-<p>아래 마당에서는 질통을 진 양씨가 떠나려는데 커피배달 아가씨가 지나다 멈춰 섰다.</p>
-<p class="dialogue">"아저씨, 쉬면서 하세요."</p>
-<p class="dialogue">"쉬면 안 돼."</p>
-<p>양씨가 삼 층 창문 쪽을 올려다보았다. 아가씨도 따라 올려다보았다. 그 창문 앞에서 덕배와 주승호가 내려다보며 이야기하고 있었다.</p>
-<p class="dialogue">"저 인력사장이 위에서 내려다보잖아?"</p>
-<p class="dialogue">"그래도 쉬세요. 너무 힘들어 보여요."</p>
-<p class="dialogue">"쉬면 모가지다. 모가지는 아니어도 일, 잘 안 내보내준다고."</p>
-<p class="dialogue">"아이 아저씨, 불쌍해서 어떡해?"</p>
-<p>양씨가 질통을 지고 건물 안으로 들어갔다. 빈 질통을 지고 나오던 허씨가 아가씨를 보았다.</p>
-<p class="dialogue">"이 근처 다방 생겼어?"</p>
-<p class="dialogue">"네."</p>
-<p class="dialogue">"티켓다방이야?"</p>
-<p class="dialogue">"아니요. 아주 큰 다방예요. 놀러들 오세요."</p>
-<p>아가씨가 광고가 붙은 시원한 물병을 주었다.</p>
-<p class="dialogue">"그 커피는 누가 시킨 거야?"</p>
-<p class="dialogue">"사무실 사람들이 시켜서 왔어요."</p>
-<p class="dialogue">"다방 어디 있어?"</p>
-<p class="dialogue">"카바레 없어지고 그 자리에 다방 생겼잖아요?"</p>
-<p class="dialogue">"경찰서장이 하던 카바레?"</p>
-<p class="dialogue">"네. 그렇다나 봐요."</p>
-<p class="dialogue">"그럼 거기서 여기까지 배달 온다고?"</p>
-<p class="dialogue">"차로 배달하는데 뭐가 멀어요? 커피 남은 거 있는데 좀 따라 드릴까요?"</p>
-<p>허씨가 다이 쪽으로 걸음을 옮겼다.</p>
-<p class="dialogue">"아니야, 우리 일 해야 돼."</p>
-<p>2</p>
-<p>시골 장터 어느 밥집 앞에 승용차와 승합차가 섰다. 덕배와 한선구가 승용차에서 내리고 일꾼들이 승합차에서 내렸다. 안에서는 몇몇 사람들이 식사를 하고 있었고, 카운터 앞의 조형사 부인이 문을 열고 들어서는 손님들을 보았다.</p>
-<p class="dialogue">"어서 오세요."</p>
-<p class="dialogue">"아주머니 안녕하세요?"</p>
-<p class="dialogue">"어! 인력 사장님께서 어쩐 일로……?"</p>
-<p class="dialogue">"식사하러 왔습니다."</p>
-<p class="dialogue">"잘 오셨습니다."</p>
-<p class="dialogue">"그래 조형사님한테서는 좋은 소식 있습니까?"</p>
-<p class="dialogue">"경찰에서 석방시키기로 했다나 봅니다. 사건은 많고 일꾼은 적다고, 서에는 조형사가 있어야 된다나 봅니다."</p>
-<p class="dialogue">"너무 잘 됐네요."</p>
-<p class="dialogue">"……."</p>
-<p class="dialogue">"손님들이 많은데요."</p>
-<p class="dialogue">"시장이라 사람들, 좀 있어요. 일행이신가요?"</p>
-<p class="dialogue">"네."</p>
-<p class="dialogue">"그러면 이쪽으로 앉으세요."</p>
-<p>창문 쪽 붙은 식탁으로 일꾼들이 자리를 잡았다.</p>
-<p class="dialogue">"조형사님이 이 집에서도 식사 좀 하라고 해서."</p>
-<p class="dialogue">"그래요?"</p>
-<p class="dialogue">"네."</p>
-<p class="dialogue">"그러면 우리 집에 일꾼들 좀 보내주세요. 우리 집은 좀 번거롭지만 생선 직접 굽고 국도 바로 끓이고 그래요. 냉장고에서 반찬 꺼내드리지 않아요."</p>
-<p class="dialogue">"그렇게 해서 이가 남습니까?"</p>
-<p class="dialogue">"시장사람들에겐 따듯한 게 좋아요. 그 분들, 하루 종일 밖에서 살잖아요."</p>
-<p class="dialogue">"내가 일 맡음, 업자들 데리고 오지요."</p>
-<p class="dialogue">"그러시면 고맙지요. 밥만 팔아서는 매상 안 오릅니다. 우리 집, 탕도 잘하고 구이도 잘해요."</p>
-<p class="dialogue">"그래, 경찰서 사람들은 좀 와 보나요?"</p>
-<p class="dialogue">"그럼요. 그 사람들도 가끔 와서 팔아줘요. 그렇지만 우리 남편 출소하면 이 식당도 그만둘 거예요."</p>
-<p>식당아줌마가 다가왔다.</p>
-<p class="dialogue">"아저씨들, 뭐 드실 겁니까?"</p>
-<p>일꾼들이 메뉴판을 보았다.</p>
-<p class="dialogue">"자들, 마음껏 실컷 들어요. 곰빵 내일도 해야 합니다."</p>
-<p class="dialogue">"아무거나 요!"</p>
-<p>허씨가 소리쳤다.</p>
-<p class="dialogue">"아무거나 라면 다른 식당에서는 재활용음식들 준다던데요."</p>
-<p class="dialogue">"우리 식당에서는 제일 좋은 걸로 해서 드립시다."</p>
-<p>일꾼들이 환하게 웃었다.</p>
-<p>3</p>
-<p>경찰 복지회관 건축현장은 주위에 가림막이 둘러쳐진 채 골조공사 중이었다. 이 층 골조가 올라가고 삼 층 골조 거푸집을 세우고 있었다. 경찰서장과 수사과장이 건물을 둘러보다가 상판 위에서 거푸집을 세우는 목수들과 말을 나누었다.</p>
-<p class="dialogue">"수고들 하십니다."</p>
-<p class="dialogue">"서장님, 수사과장님, 오랜만에 오셨습니다."</p>
-<p class="dialogue">"그동안 바빠서 들여다보지 못했더니……."</p>
-<p class="dialogue">"……."</p>
-<p class="dialogue">"일, 늦는 거 맞지요?"</p>
-<p class="dialogue">"네. 속도가 느렸습니다."</p>
-<p class="dialogue">"업자들이 왜 이럽니까?"</p>
-<p class="dialogue">"자기 일을 남의 일처럼 하나 보지요?"</p>
-<p class="dialogue">"남의 일이잖아요?"</p>
-<p class="dialogue">"어떻게 남의 일입니까? 자기가 맡아서 하면 그게 바로 자기 일이지."</p>
-<p class="dialogue">"서장님. 그래도 내가 여기서 일할 때는 놀지 않은 겁니다. 그때는 공사 진척 빨랐습니다."</p>
-<p class="dialogue">"목수 아저씨."</p>
-<p class="dialogue">"네."</p>
-<p class="dialogue">"요즈음도 목수 분들 부족합니까?"</p>
-<p class="dialogue">"목수들은 많습니다."</p>
-<p class="dialogue">"그런데 목수들이 없어서 일 못 하겠다는 소리는 뭡니까?"</p>
-<p class="dialogue">"댐 골조공사를 맡은 영진건설 유사장이 일, 여기저기 벌려놓다 보니, 한두 군데에서 돈 잘 안 나오면 그 영향 여기까지 미칩니다."</p>
-<p class="dialogue">"우리는 목수 분들께 돈, 그날그날 직접 다 드리잖아요?"</p>
-<p class="dialogue">"네. 맨 처음엔 유사장, 그거 때문에 깽판까지 친걸요."</p>
-<p>두 사람이 말을 잃었다.</p>
-<p class="dialogue">"이 현장, 돈 잘 준다는 소문만 번지면 일에는 차질 없을 겁니다."</p>
-<p class="dialogue">"그럴까요?"</p>
-<p class="dialogue">"네."</p>
-<p class="dialogue">"그래야지요. 우린, 수사 때문에 여기까지 신경 쓸 새가 없어요."</p>
-<p class="dialogue">"여기서는 돈 때문에 걱정 마십시오. 관급공사라 틀림없는 곳입니다. 또 우리가 시내에서 사용하던 사무실 돈도 뽑아 이 공사에다 넣었으니까, 이 집 일하면서 돈 걱정일랑 마십시오."</p>
-<p class="dialogue">"댐도 관급공사인데 왜 거기서는 돈, 잘 안 나옵니까?"</p>
-<p class="dialogue">"거기도 돈 잘 안 나온다고요?"</p>
-<p class="dialogue">"그렇다나 봐요."</p>
-<p class="dialogue">"거기는 말로는 국책사업이라 해도 합자회사나 다름없습니다. 민간투자자들도 있잖습니까?"</p>
-<p class="dialogue">"아, 그래서 거기 가끔 돈들이 늦게 나와서 요즈음 일이 늦어지는군요. 까딱 잘못하다간 댐 작업도 일시 중단될지도 모른다네요."</p>
-<p class="dialogue">"무슨 일이 시작한 지 얼마 되지도 않았는데 그래?"</p>
-<p>수사과장이 목소리를 낮추어 귓속말을 했다.</p>
-<p class="dialogue">"서장님, 우리 한번 이 기회에 댐 회사도 수사해 볼까요?"</p>
-<p class="dialogue">"댐 회사 사정으로 돈 늦게 나오는 걸 우리가 무슨 권한으로 수사를 해요. 수사과장, 목 잘리고 싶어서 그래요? 그 사람들 때문에 우리가 복지회관 건물 짓는 건데."</p>
-<p class="dialogue">"우리가 그때 이 복지회관 지을 때 댐 공사장서 유사장을 만나서 부탁하지 말았어야 했는데요. 이제 댐 현장 사람들이 우리에게 반격해 오면 어쩌지요?"</p>
-<p class="dialogue">"그건 유사장 욕심이었어. 그 사람, 돈도 별로 없었으면서 왜 일을 그렇게 많이 맡아서 해. 그 사람, 돈 돌려막기 하다가 펑크 난 거지. 그 사람, 일꾼 돌려막기 하다가 낭패 본 거지."</p>
-<p>수사과장이 고개를 끄덕였다.</p>
-<p class="dialogue">"이 건축업자, 사람들 말로는 우리 일만 아니었더라도 근근이 버텨나갈 수 있었다는데……. 서과장?"</p>
-<p class="dialogue">"네."</p>
-<p class="dialogue">"기운 내! 우리 잘못이 아니라 유사장 욕심 때문이었으니까."</p>
-<p>그때 목수의 휴대폰이 울렸다.</p>
-<p class="dialogue">"네. 네? 유사장이 도망갔다고요? 댐에 목수들도 대주지 못하고 도망갔다고요?"</p>
-<p class="dialogue">"유사장이 도망감 어떡해? 가뜩이나 바빠 죽겠는데…… 한 사람이 어딘데……."</p>
-<p>목수가 전화를 끊고 두 사람 옆으로 왔다.</p>
-<p class="dialogue">"유사장, 한쪽에서 공사비를 못 받게 됐답니다. 그렇게 되자 양쪽 공사비를 충당치 못해 돈을 받고 그대로 사라졌나 봅니다. 유사장, 어떻게든 살아보려고 교회수리공사 수주도 시도해봤지만 실패했답니다."</p>
-<p>두 사람이 아무 말도 하지 못했다.</p>
-<p class="dialogue">"그래도 목수는 얼마든지 있습니다. 이 경찰 복지회관, 돈 잘 주는 곳이니까 내가 여기저기 선전해드리죠."</p>
-<p>서장과 수사과장이 씁쓸하게 현장을 돌아섰다.</p>
-<p>4</p>
-<p>댐 숙소 방 안, 한선구가 호바로 자갈을 덮고 있는데 목사가 들어왔다.</p>
-<p class="dialogue">"한선구씨, 일하시네요."</p>
-<p class="dialogue">"목사님 오셨어요?"</p>
-<p class="dialogue">"네. 자갈 일, 힘들겠습니다."</p>
-<p class="dialogue">"자갈, 저 밑에서 예까지 등짐 지고 올라오는 사람들도 있는데요."</p>
-<p class="dialogue">"그래, 선미씨는 잘 있나요?"</p>
-<p class="dialogue">"네. 저번에 한번 서울 있는 고향청년들과 같이 여성의 집 갔다 왔었습니다."</p>
-<p class="dialogue">"잘 하셨네요. 나도 거기 한번 갈 일 있어서 곧 가 볼 겁니다."</p>
-<p class="dialogue">"목사님이 그 여성의 집에 무슨 볼일 있습니까?"</p>
-<p class="dialogue">"내가 선미씨 그쪽에다 소개했잖습니까? 그랬더니 그쪽서 설교 한번 해달라고 해서요."</p>
-<p class="dialogue">"하여튼 목사님, 고맙습니다. 불쌍한 우리 선미 보살펴 주셔서요. 그런데 목사님 여긴 웬일로 오셨습니까?"</p>
-<p class="dialogue">"……."</p>
-<p class="dialogue">"구경 오셨습니까?"</p>
-<p class="dialogue">"한선구씨, 이 일 곧 끝나지요?"</p>
-<p class="dialogue">"네."</p>
-<p class="dialogue">"우리 교회 수리 좀 부탁드립니다."</p>
-<p class="dialogue">"교회수리라면 공사가 클 텐데요."</p>
-<p class="dialogue">"교회 다시 지을 거라서 그렇게 대대적인 수리는 안 할 겁니다. 교회수리 하실 수 있지요?"</p>
-<p class="dialogue">"네. 목사님이 해달라고 그러시면 해드려야지요."</p>
-<p class="dialogue">"참, 저번에 댐 옹벽공사를 맡은 유사장이 교회수리 한다는 소식 듣고, 교회수리 자기가 하겠다고 자기 달라고 하더라고요."</p>
-<p class="dialogue">"그래서요?"</p>
-<p class="dialogue">"우리도 그 사람에 대한 정보가 입수돼서 그 사람 일 안 주기로 했어요."</p>
-<p class="dialogue">"잘 하셨어요. 그 분, 얼마 전까지는 말 그대로 유능해서 그 사람에게 교회수리를 맡겼더라면 좋았을 텐데…… 했을 겁니다. 그러나 그래도 그 분, 교회수리 같은 일은 맡지도 않을 사람이었는데……. 하여튼 고맙습니다."</p>
-<p class="dialogue">"뭐가요?"</p>
-<p class="dialogue">"그 교회수리 일, 제게 돌아와서요."</p>
-<p>5</p>
-<p>대신인력 사무실에서 덕배가 장부를 정리하는데 전화가 울렸다.</p>
-<p class="dialogue">"여보세요."</p>
-<p class="dialogue">"주기사님."</p>
-<p>댐건설회사 사무실에서 주승호가 수화기를 들고 있었다.</p>
-<p class="dialogue">"그 인력에 목수들 많습니까?"</p>
-<p class="dialogue">"네."</p>
-<p class="dialogue">"댐에서 일할 목수, 확보해주세요."</p>
-<p class="dialogue">"네?"</p>
-<p class="dialogue">"목수 확보 할 수 있지요?"</p>
-<p class="dialogue">"그럼요."</p>
-<p class="dialogue">"영진건설 유사장, 아무래도 이상해요."</p>
-<p class="dialogue">"왜요?"</p>
-<p class="dialogue">"유사장이 일 맡아하던 데서 돈 받지 못해 도망갔나 봐요."</p>
-<p class="dialogue">"그럼 난, 그 사람한테 돈 뜯겼네요. 이를 어쩌지요?"</p>
-<p class="dialogue">"많이 물렸습니까?"</p>
-<p class="dialogue">"많이 됩니다."</p>
-<p class="dialogue">"저―, 강사장님, 유사장과의 관계는 다음에 생각하시고요. 지금 당장 우리한테 목수들 대 주겠습니까?"</p>
-<p class="dialogue">"……."</p>
-<p class="dialogue">"장사, 밑진 건 밑진 거고, 또 이 남는 자리가 나왔으면 잡아야지요. 안 그렇습니까?"</p>
-<p class="dialogue">"목수 인건비, 회사에서 책임져 주는 게 확실하다면 대드리지요. 대드려야지요."</p>
-<p>수화기를 내려놓은 덕배가 장부를 한참 들여다보았다. 물린 돈은 그 자리에 그대로 있었고, 새 일은 그 위에 얹혀 왔다.</p>
-<p>6</p>
-<p>댐 숙소 앞, 한선구가 곰빵 일꾼들과 함께 쉬고 있었다.</p>
-<p class="dialogue">"일들 하는 거 보면 힘들 참 좋습니다."</p>
-<p class="dialogue">"힘은 일 안 하는 사람들이 더 좋지요. 우린 맨날 일하느라고 골병들어서 힘없어요. 살려니 어쩔 수 없이 하는 겁니다."</p>
-<p class="dialogue">"돈이 없어서 이 일 하는 거지, 돈 좀 있음 이 힘든 일 누가 합니까? 이 등짐 하루 지고 나면 집에 가서 몸 아파 죽을 지경입니다. 그럴 때면 꼭 깡패한테 뚜드려 맞은 기분입니다."</p>
-<p class="dialogue">"생각해보세요. 그 무거운 거를 하루 종일 계단 타고 오르락내리락 하니 힘, 안 들겠어요?"</p>
-<p class="dialogue">"기술이나 기능, 배우지 그래요."</p>
-<p class="dialogue">"이걸로 나간다면 몰라도, 지금 일 없어서 잠시 노느니 이 일이라도 하는 겁니다."</p>
-<p>한선구가 고개를 끄덕였다. 그때 이혜자가 다가왔다.</p>
-<p class="dialogue">"한선구씨, 여기서 일하세요?"</p>
-<p class="dialogue">"어떻게 여기까지……?"</p>
-<p>두 사람이 서로 손을 마주 잡았다.</p>
-<p>7</p>
-<p>댐 회사 회의실, 앞쪽 벽면에 대형 모니터 화면이 매달리고 한쪽 벽면에는 댐 조감도와 공사현장사진과 안전포스터가 붙어 있었다. 바닥에는 댐 모형건축물이 설치되어 있고, 한편 구석에는 측량기기와 설계도면 책들과 안전모와 삽과 줄자가 놓여 있었다. 원형 테이블에 댐사장과 박과장과 주승호와 권진호가 둘러앉아 캔 음료를 마셨다.</p>
-<p class="dialogue">"골조 유사장이 도망갔다면서요?"</p>
-<p class="dialogue">"그랬다네요."</p>
-<p class="dialogue">"우리는 손해 본 거 없습니까?"</p>
-<p class="dialogue">"우리야 손해 본 거 없습니다. 있다면 앞으로 일하는데 목수가 없어서 그 영향 받을 겁니다."</p>
-<p class="dialogue">"목수 걱정은 하지 않으셔도 됩니다. 제가 대신인력 강덕배 사장에게 말해놨습니다. 목수 확보해달라고요."</p>
-<p class="dialogue">"그러니까 뭐래요? 대준답디까?"</p>
-<p class="dialogue">"네. 대준답니다."</p>
-<p class="dialogue">"그 인력도 유사장에게 돈 뜯겼을 텐데……."</p>
-<p class="dialogue">"돈, 뜯겼답니다. 뜯겨도 많이 뜯겼답니다. 그래도 장사니까 어쩌겠습니까? 우리만 확실히 책임져준다면 목수 대주겠답니다."</p>
-<p class="dialogue">"주기사, 수고 많았어요. 허지만 우리 댐 회사도 지금 긴축재정을 염두에 두고 일해야 됩니다."</p>
-<p class="dialogue">"회사 사정 좋지 않습니까?"</p>
-<p class="dialogue">"경영상의 문제점들이 여기저기서 속속 드러나고 있어요. 우리 회사가 그동안 퍼주기 식 공사를 해왔다니까요."</p>
-<p class="dialogue">"유사장님은 어떻게 할 겁니까?"</p>
-<p class="dialogue">"그분, 우리에게 직접적인 피해를 준 것도 아니고 보면 그냥 그대로 놔두십시다. 그 사람도 무던히 살려고 하던 사람인데 왜 그랬을까? 다만 우리가 염두에 둘 것은, 목수들이 일제히 바뀌면 그 사람들 오느라고 준비하는 시간도 있을 거고, 또 그 사람들 교육도 시키고 해야 하니까, 댐 공사는 당분간 잠시 중단될 거로 봅니다."</p>
-<p class="dialogue">"목수 부문만 중단되는 거지 다른 파트는 계속 일해도 되잖습니까?"</p>
-<p class="dialogue">"목수들이 일해 놓은 게 없는데 어떻게 다른 파트들이 일합니까?"</p>
-<p>박과장이 대꾸하지 못했다. 한 사람이 사라지자 사백 미터 옹벽 위의 일이 통째로 멎게 되어 있었다.</p>
-<p>8</p>
-<p>카바레가 있던 자리에 새로 생긴 다방, 음악이 흘렀다. 한선구와 이혜자가 들어서자 아가씨가 다가왔다.</p>
-<p class="dialogue">"어서 오세요? 저쪽 안쪽으로 들어가세요."</p>
-<p>두 사람이 안쪽 테이블에 앉자 아가씨가 주문을 받으러 왔다.</p>
-<p class="dialogue">"뭐 드시겠습니까?"</p>
-<p class="dialogue">"이혜자씨 뭐 하시겠습니까?"</p>
-<p class="dialogue">"커피."</p>
-<p class="dialogue">"그럼 커피 두 잔이요."</p>
-<p class="dialogue">"네."</p>
-<p>아가씨가 돌아서다가 다시 돌아보았다.</p>
-<p class="dialogue">"아저씨는 댐 공사장서 오신 분 같다."</p>
-<p class="dialogue">"그래요. 댐 숙소 짓는 데서 왔어."</p>
-<p class="dialogue">"아아, 내가 아까 거기 차 배달하느라고 들렸었는데요."</p>
-<p>아가씨가 돌아갔다.</p>
-<p class="dialogue">"이혜자씨, 여긴 갑자기 어떻게 왔어요?"</p>
-<p class="dialogue">"한선구씨가 보고 싶어서 왔지요. 같이 살기로 하니까 왠지 자꾸만 보고 싶은 거 있지요."</p>
-<p class="dialogue">"……."</p>
-<p class="dialogue">"일 많아요?"</p>
-<p class="dialogue">"네."</p>
-<p class="dialogue">"몸조심해서 하세요. 뭐니 뭐니 해도 건강이 제일예요. 건강 잃음 돈 한 푼도 못 번다는 거 잊지 마시고요."</p>
-<p class="dialogue">"네. 그래 이혜자씨는 배구선수생활 지금도 하나요?"</p>
-<p class="dialogue">"결혼하면 하지 않기로 했어요. 지금은 계약기간도 아직 남아있고 해서 일영훈련원에 계속 나가고 있어요."</p>
-<p class="dialogue">"나, 이 일 끝나도 일 할 거 많이 있어요. 마을에서 어떤 분이 집수리 해달라고 하지요. 또 교회에서도 목사님이 교회수리 해달라고 하네요."</p>
-<p class="dialogue">"일 많이 따서 좋네요. 돈 있어도 일 못 맡으면 김빠지는 일인데, 돈 없어도 할 일이 생겼다니 정말 좋네요. 그래 그 일 할 만큼의 돈, 여유는 있어요?"</p>
-<p class="dialogue">"돈이요? 받아가며 해야지요."</p>
-<p>아가씨가 커피를 놓고 갔다.</p>
-<p class="dialogue">"궁상맞게 그렇게 그런 식으로 일하지 마세요."</p>
-<p class="dialogue">"그럼 덕배 친구와 동업을 하든지 꾸든지 할 겁니다."</p>
-<p class="dialogue">"덕배 친구가 누굽니까?"</p>
-<p class="dialogue">"고향 불알친구예요. 여기서 인력공사 하는 사람인데, 지금 하고 있는 공사도 그 친구와 같이 동업하는 겁니다."</p>
-<p class="dialogue">"앞으로는 그렇게 하지 마세요. 우리는 서로 결혼해 살기로 했잖아요."</p>
-<p class="dialogue">"네."</p>
-<p class="dialogue">"그럼 내가 돈 댈 테니 내 돈 갖다 쓰세요. 내가 전에 한선구씨에게 뭐랬어요? 우리 중견 건설업 하나 하자고 했잖아요."</p>
-<p class="dialogue">"압니다. 그렇지만 지금 맡은 일들은 그 친구와 같이 해야 해요. 그 덕배 친구가 알면 날 배신자라고 할 겁니다."</p>
-<p class="dialogue">"부인 될 사람이 돈 대겠다는데 그런 말이 어딨어요? 지금 그 사람은 인력공사라도 하는데, 그래 그런 친구가 선구씨가 이거 하는 것도 넘봐요?"</p>
-<p class="dialogue">"그래도 이 산수마을 내려와서 일 해보라고 한 사람도 그 친구였고, 또 지금 맡아서 하는 일도 그 친구가 소개한 거고, 게다가 앞으로 할 일들도 지금 하는 일 때문에 들어온 일인데요."</p>
-<p class="dialogue">"……."</p>
-<p class="dialogue">"……."</p>
-<p class="dialogue">"어쨌든 동업은 깨지게 돼 있다고요."</p>
-<p>한선구가 떨떠름한 표정으로 커피잔을 들었다.</p>
-<p>9</p>
-<p>그 무렵 유사장은 멀리서 뾰족탑이 선 교회를 바라보고 있었다.</p>
-<p class="scene-break">― 교회에서 교회 수리하는 일만 줬더라도 나, 이렇게 도망 다닐 일은 없었을 텐데…….</p>
-<p>간선도로 변 인도에서 가을 낙엽을 밟으며 걸을 때에도 같은 생각이 따라왔다.</p>
-<p class="scene-break">― 그냥 목수로 있을 걸. 괜히 오야지는 한다고 고생만 많았지.</p>
-<p>한강다리 난간에 서서 다리 밑으로 흘러가는 물을 내려다볼 때에도 그랬다.</p>
-<p class="scene-break">― 그냥 오야지로 있을 걸. 괜히 단종업자 노릇하느라고 남들 좋은 일만 해줬지.</p>
-<p>어느 술집 카운터 앞에서 와인을 마시며 그가 중얼거렸다.</p>
-<p class="dialogue">"그냥 댐 골조 공사만 할 걸. 이 공사 저 공사 한다고 결국은 남들에게 피해만 입히고 이렇게 도망자 신세가 됐네."</p>
-<p>모텔 방 침대에 누워서도 잠이 오지 않았다.</p>
-<p class="scene-break">― 이제는 새로 시작해야지. 목수부터 새로 시작하는 거야. 젊은 목수들과 같이 일한다면 내가 그 사람들보다는 기술은 좋다 해도 힘에서 딸릴 텐데……. 이 유사장도 그 좋던 시절 다 지나갔구나. 그 좋던 시절 다시는 안 오겠지.</p>
-<p>그가 침대 위에서 몸을 이리저리 뒤척였다.</p>
-<p>10</p>
-<p>국립중앙박물관 건물 앞뜰, 돌계단을 올라서면 돌바닥이 넓게 펼쳐지고 많은 관람객들이 건물 안으로 들어갔다. 회의실 원탁에 박물관장과 문영모 과장과 홍보팀 직원 심진섭이 앉았다.</p>
-<p class="dialogue">"제가 지난번 산수마을 천병진 기사 결혼식 갔을 때, 여기에도 왔다 갔었던 오명선 마을기자에게, 산수마을 물에 잠기기 전에 우리 박물관 유물 조사팀이 그곳으로 발굴하러 간다고 말했습니다."</p>
-<p class="dialogue">"그 지역에 관한 역사적인 기록물, 옛 지도 등 문헌들을 참조해 본 결과, 그래도 그곳에서 옮길 만한 것들을 찾아내지 않았습니까?"</p>
-<p class="dialogue">"이 기획유물 발굴 작업에 도움 줄 수 있는 향토사학가도 구했으면 좋겠습니다."</p>
-<p>관장과 과장이 고개를 끄덕였다.</p>
-<p class="dialogue">"그리고 우리 유적지 유물 발굴 조사단, 댐을 짓고 있는 수자원공사와도 의논하고 해야지요? 유적지, 고인돌을 옮기는 방안도 강구해보고요. 또 어디어디에다 절개지, 새 도로, 터널을 조성하고 있는지 그것도 알아보고, 알아보고 나면 우리도 그것을 토대로 할 일이 아주 많을 겁니다."</p>
-<p class="dialogue">"큰 성과 올리고 오겠습니다."</p>
-<p class="dialogue">"그래요. 옛것을 발견하고 보존하는 일은 새것을 발명하는 거에 버금가는 일이라는 걸 명심하고 현지로 출발하세요."</p>
-<p class="dialogue">"네."</p>
-<p>11</p>
-<p>산 밑, 국립박물관 유물조사 발굴 팀 사람들이 도착했다. 어떤 사람은 고문서와 옛 지도 사본을 들고 여기저기 살피며 오갔다. 명선이 따라다니며 사진을 찍었다.</p>
-<p class="dialogue">"아저씨들, 여기 좀 한번 파보세요."</p>
-<p class="dialogue">"네."</p>
-<p>일꾼들이 삽으로 땅을 팠다.</p>
-<p class="dialogue">"좀 이상한 것이 보이면 우리에게 말씀해주고 조심해서 파야 합니다. 지금 장비를 투입시키려고 해도 아직 초기 단계라 우선 삽으로 하는 겁니다."</p>
-<p class="dialogue">"예, 알겠습니다."</p>
-<p class="dialogue">"기획 발굴이라는데 여기에서 좋은 거라도 뭐 나올 가망이 있습니까?"</p>
-<p class="dialogue">"고문헌과 옛 지도를 보면 이 자리에 뭐 있긴 있을 거 같습니다. 이렇게 자료를 활용해서 찾는 유물들이 고귀하고 가치가 있는 것들입니다. 허지만 변수라면, 세월이 많이 흐르다 보니 유물들이 자연의 변화로 유실됐다거나 도굴범에 의해 도난됐을 가능성도 배제치는 못합니다. 혹시 가망이 없다 해도 추측이 가면 땅을 파 봐야지요."</p>
-<p class="dialogue">"발굴이 안 된다 해도 우리는 박물관에서 이곳으로 올 적에, 여기에서 하여야 할 일들을 정하고 왔기 때문에 그 일들을 다 해놓고 갈 겁니다."</p>
-<p class="dialogue">"그 일들이 뭡니까?"</p>
-<p class="dialogue">"아직까지도 옮기지 않고 방치해두었던 유적지와 고인돌을 옮기는 일입니다."</p>
-<p class="dialogue">"그런 일들은 댐 건설이 시작되기 전에 다 이뤄졌어야 하는 게 아닙니까?"</p>
-<p class="dialogue">"그렇지요. 그런데 수자원공사 측과 우리 박물관 측 사이에, 이 댐 지역을 조사해야 된다는 것에 대해 서로 행정적인 착오가 있었나 봅니다. 이곳에 댐이 들어서게 되면, 댐이 건설되기 전에 이 댐 지역에서 수몰될 수 있는 문화재, 유적지, 유물들은 미리 옮겨 놓는 게 상례인데요."</p>
-<p class="dialogue">"그렇다면 이런 사실을 어느 한쪽이 통보하는 걸 유기시켰나 보네요? 아니면 통보받고도 묵살을 했다거나……."</p>
-<p>두 사람이 대답하지 못했다.</p>
-<p class="dialogue">"하여튼 늦게나마 조사를 하게 돼서 다행입니다. 까딱 잘못했다간 귀중한 역사적인 유물들이 수몰될 뻔했겠네요."</p>
-<p class="dialogue">"네. 그렇습니다. 그래도 늦게나마 조사를 하게 된 동기도, 천병진 기사나 민기사가 발굴해서 신고한 그 출토품 유물 때문이었습니다."</p>
-<p class="dialogue">"오명선씨."</p>
-<p class="dialogue">"네."</p>
-<p class="dialogue">"혹시 이 마을에 향토사학가라고, 이 마을을 연구하고 이 마을을 사랑하는 그런 사람 있습니까? 나이 좀 들고 하신 분으로……."</p>
-<p class="dialogue">"이 마을에서는 그런 직함 가지고 있는 사람, 듣도 보도 못했습니다. 또 이 마을엔 노인들도 별로 없습니다. 왜요?"</p>
-<p class="dialogue">"됐습니다. 그냥 그런 분이 계셨더라면 우리가 일하는 데 훨씬 수월할 거 같아서 물어본 거뿐입니다."</p>
-<p>마을을 기억하는 노인이 없는 마을에서, 서울 사람들이 고문헌을 들고 땅을 파고 있었다.</p>
-<p>12</p>
-<p>산기슭 밑에서는 철거 팀들이 여전히 산 밑의 풀과 나무를 제거하고 물에 잠길 땅을 깎아내고 있었다. 그들이 건너편 산 위에서 사람들이 오가는 것을 보았다.</p>
-<p>발굴 현장에는 삽과 곡괭이로 파낸 자리가 제법 넓어져 있었고, 주변에는 파는 범위를 표시하는 횟가루 줄이 뿌려져 있었다. 털보아들이 올라와 보았다.</p>
-<p class="dialogue">"아저씨들, 여기서 뭐 합니까?"</p>
-<p class="dialogue">"황창식씨! 작업하다 말고 여긴 또 왜 올라왔어?"</p>
-<p class="dialogue">"궁금해서 왔지. 그래, 댁들은 누구세요? 이 고향사람들입니까?"</p>
-<p class="dialogue">"아 아닙니다. 우리는 이 수몰될 지역에 있는 각종 문화재들을 조사해서, 그 문화재들을 재난으로부터 보호하고 복원시키는 일을 하려고 국립중앙박물관에서 나온 사람들입니다. 그런데 댁은 누구십니까?"</p>
-<p class="dialogue">"저, 저 아래 보이는 산기슭에서 불순물들을 제거하는 사람입니다."</p>
-<p class="dialogue">"아하! 그러면 수자원공사 측으로부터 통보받은 거 없습니까?"</p>
-<p class="dialogue">"무슨 통보요?"</p>
-<p>그때 그의 휴대폰이 울렸다.</p>
-<p class="dialogue">"네. 내일부터 일, 나오지 말라고요? 누가 그래요? 수자원공사 측에서요? 네. 국립박물관 사람들이 와서 일하는 바람에 우리 작업이 당분간 중지됐다고요? 네. 알겠습니다."</p>
-<p>전화를 끊은 털보아들이 미친 듯이 산 아래로 뛰어 내려갔다. 문영모 일행이 그 뒷모습을 바라보며 웃었다.</p>
-<p>13</p>
-<p>바닷가 이 층 횟집, 넓은 판유리 너머로 출렁이는 바다에 정박한 큰 선박과 출어를 기다리는 고깃배들, 바다 위를 낮게 떠다니는 갈매기 떼가 한눈에 들어왔다. 문영모와 심진섭과 작업자들이 홀에 들어서자 식당주인과 명선이 맞았다.</p>
-<p class="dialogue">"또 오셨네요."</p>
-<p class="dialogue">"어떻게 우리를 알아보시네요?"</p>
-<p>주인이 웃었다. 아가씨들이 일행을 갈매기 방으로 안내했다.</p>
-<p class="dialogue">"문과장님, 제가 서울 박물관 갔을 때 그랬지요. 다음에 내려오심 제가 한턱낸다고요?"</p>
-<p class="dialogue">"네. 고맙습니다. 그런데 명선씨, 이거 마을신문기금에서 쓰는 겁니까?"</p>
-<p class="dialogue">"아 아니요. 우리 집, 여러분들께 식사 한 끼 접대할 여력은 있습니다."</p>
-<p class="dialogue">"바다냄새가 물씬 풍깁니다."</p>
-<p class="dialogue">"이집, 맛있는 집인데 먼젓번에는 그 출토품 분실 사건 때문에 맛을 모르고 먹었었습니다. 오늘은 맛있게 먹을랍니다."</p>
-<p>풍광 좋고 아늑한 갈매기 방은 사면 벽이 온통 통유리였다. 길쭉한 테이블 앞에서 술이 곁들여진 회 요리가 나왔다.</p>
-<p class="dialogue">"이렇게 횟집에 와서 먹으면, 저 바닷가 시장에서 파는 거 직접 사서 해먹는 것보다 비싸기는 하지만, 그래도 여기서 이렇게 먹는 게 더 정갈하고 맛있고 기분 좋습니다."</p>
-<p class="dialogue">"과장님, 지금 그걸 말씀이라고 하세요?"</p>
-<p class="dialogue">"기자 양반에게 이렇게 대접받다 큰 코 다치는 건 아니겠지요?"</p>
-<p class="dialogue">"과장님 코, 작아서 다칠 데도 없으니 안심하고 마음껏 드세요. 우리 지역에 오셨으니까 여러분들은 제 손님입니다."</p>
-<p>일행이 고개를 끄덕이며 젓가락을 들었다.</p>
-<p class="dialogue">"조형사, 민기사, 천기사, 다들 잘 있지요?"</p>
-<p class="dialogue">"아니요. 지금은 민기사만 댐 지역에서 일합니다."</p>
-<p class="dialogue">"그럼 다른 사람들은요?"</p>
-<p class="dialogue">"조형사는 아직도 구치소에서 재판 계류 중에 있고요. 천기사는 신혼여행을 중국 처갓집 쪽으로 갔는데, 그 처가 쪽 요청에 따라 당분간 거기서 살기로 했대요. 천기사, 국제결혼을 잘한 건지 잘못한 건지 통 모르겠네요."</p>
-<p class="dialogue">"그러시는 명선씨는 시집 안 가고 기자생활만 할 겁니까?"</p>
-<p class="dialogue">"곧 갈 겁니다."</p>
-<p class="dialogue">"그러셔야지요. 그래야 산수마을도 든든해지지요."</p>
-<p class="dialogue">"듣고 보니 세월이 모든 사람들을 갈라놓기도 하고 그러는군요. 슬픕니다."</p>
-<p>잠시 아무도 말을 하지 않았다.</p>
-<p class="dialogue">"참 앞으로 우리, 장비 쓸 일도 있을 텐데 그때 민기사 와서 우리 일했음 하네요."</p>
-<p class="dialogue">"그러시면 민기사님도 좋다 하겠지요. 이건 아직은 극비인데요. 민기사님, 산에서 일하다가 또 양귀비 밭을 발견했대요."</p>
-<p class="dialogue">"그것도 그 사람, 운인가 봅니다. 하여튼 우리는 여기 온 이상 우리, 소기의 목적을 달성하고 갈 겁니다. 이번 우리가 여기 도착해서 수자원공사 측 사람들과도 만나봤는데, 그들도 법이 지금 우리가 하는 일과 일치하다면 우리를 최대한 돕겠답니다."</p>
-<p class="dialogue">"잘 됐네요. 아무쪼록 선전을 부탁합니다."</p>
-<p>14</p>
-<p>실향민촌 털보아저씨 집 안마당에서 부인이 햇볕에 말린 빨간 고추의 꼭지를 따고 있었다.</p>
-<p class="dialogue">"벌써 김장준비 하세요?"</p>
-<p class="dialogue">"미리 하나하나 준비해둬야 김장할 때 쉽지."</p>
-<p class="dialogue">"집도 어머니가 틈틈이 매만지나 봐요?"</p>
-<p class="dialogue">"왜, 집이 깨끗해 보이냐?"</p>
-<p class="dialogue">"네."</p>
-<p class="dialogue">"집과 마누라는 꾸미게 딸렸다."</p>
-<p class="dialogue">"……."</p>
-<p class="dialogue">"너, 산 밑마다 다니면서 산 정비작업 한다면서?"</p>
-<p class="dialogue">"네. 수질정화 차원에서 댐에 물이 찼을 경우를 생각해서, 댐 지역이 물에 잠기기 전 물에 잠기면 썩게 될 물질들을 미리 제거하는 작업예요."</p>
-<p class="dialogue">"그게 모두 산 밑 땅을 깎아내고 나무 베어내는 일일 텐데 얼마나 힘들겠어? 고생한다. 고생이 많다."</p>
-<p class="dialogue">"고생보다도 일이 그런가 봐요. 요즈음은 여기저기서 이상한 일만 터지고 그래요. 제발 그러지 않았으면 좋을 텐데."</p>
-<p class="dialogue">"이 세상에 평탄한 일만 있겠니? 이 세상에는 별의별 일들이 태산같이 많단다. 너, 건강 생각해서 집에 자주 들려라."</p>
-<p class="dialogue">"네. 서울서 박물관 사람들이 이 지역에 있을지도 모르는 유물들을 발굴하러 내려와서, 우리는 집에서 며칠 쉬어야 해요."</p>
-<p class="dialogue">"그 사람들이 왔는데 너희가 왜 쉬냐?"</p>
-<p class="dialogue">"그거야 우리 같은 낮은 사람들이 알 수가 있나요? 높은 사람들 지시에 따라 움직이는 우리로써는 몰라요. 그냥 우리가 대충 알기로는 작업순서가 우리보다 그들이 먼저라는 겁니다."</p>
-<p class="dialogue">"그렇겠다. 그들이 이곳을 작업해도 된다는 진단이 나와야, 너희들이 그 땅을 훼손시켜도 되는 거지."</p>
-<p class="dialogue">"아버지, 요즈음도 댐 기계실 나가세요?"</p>
-<p class="dialogue">"으응. 나가긴 한다만 건강 전만 못한 거 같아 안쓰럽다."</p>
-<p class="dialogue">"어머니. 우리 이렇게 매일같이 일하는데, 우리에게도 언젠가는 좋은 일 생기겠지요?"</p>
-<p class="dialogue">"그럼, 좋은 일 생기겠지. 꼭 생길 거다."</p>
-<p class="dialogue">"저도 돈 모으고 있어요. 일만 하니까 돈 벌지요. 또 나가거나 쉴 새가 없으니까 돈, 쓸 데도 없어요."</p>
-<p class="dialogue">"그래, 돈 모아야지. 지금 우리 처지에는 이 일 저 일 가릴 때도 아니고, 일 있으면 그저 닥치는 대로 해야만 사는 형국이다. 그렇지 않으면 후회할 거다."</p>
-<p class="dialogue">"네."</p>
-<p>15</p>
-<p>댐 숙소 앞에 콘크리트 펌프 카가 서 있었다. 레미콘 차량이 다가와 콘크리트를 쏟아 부으면, 건물 외벽을 타고 올라간 쇠파이프가 그것을 건물 안쪽으로 흘려보냈다. 다른 한쪽에서는 벽돌을 실은 큰 트럭이 들어오고 지게차가 벽돌 무더기를 다이째 건물 앞에 차근차근 내려놓았다.</p>
-<p>방 안에서는 기계미장이 한창이었다. 자바래 호수를 든 콘크리트공이 자갈이 깔린 바닥에 콘크리트를 골고루 쏟아 붓고, 미장이가 크고 긴 고데로 그것을 살짝살짝 빨리빨리 문질렀다.</p>
-<p>복도에서는 일꾼들이 바쁘게 움직였다. 자바래 호수 끝에 바께쓰를 대고 옆방으로 뛰어가는 콘크리트공은 쏟아져 넘치는 콘크리트를 감당치 못해, 복도와 온몸이 콘크리트 투성이였다. 덕배와 선구가 삽으로 그것을 퍼 담아 방 안쪽으로 집어넣었다. 그러다 서로 얼굴이 마주치면 피식 웃었다.</p>
-<p>주승호가 허겁지겁 다가왔다.</p>
-<p class="dialogue">"웬 회의가 그렇게 많은지 좀 늦었네요. 두 분, 사장님들 열심히 일하시네요?"</p>
-<p>두 사람이 삽을 든 채 그를 보았다.</p>
-<p class="dialogue">"기계미장하니까 좋지요? 기계미장 해야 일 빠르고 방바닥 깨끗하게 나와요."</p>
-<p>돈은 늦게 나오고 사람은 도망가고 땅은 파헤쳐지는데, 방바닥만은 하루가 다르게 매끈하게 깔리고 있었다.</p>
-            
+            <div class="section-num">1</div>
+  <p>삼 층 콘크리트 건물인 댐 숙소, 외벽에는 도비작업이 되어 있고 현관 앞마당에는 자갈이 산더미처럼 쌓여 있었다. 그 자갈 둘레 몇 군데에 다이를 놓았고, 일꾼들이 그 위에 질통을 올려놓고 삽으로 자갈을 퍼 담았다. 자갈이 가득 담긴 질통을 등에 메고 건물 안으로 들어가 계단을 올랐다. 전등불이 환히 켜진 방 안에서 엑셀호수가 깔린 바닥에 자갈을 쏟아 부으면, 또 다른 일꾼이 호바로 그 자갈을 호수 위에 잘 덮었다. 덤프트럭이 와서 자갈을 또 쏟아 붓고 갔다.</p>
+  <p>덕배가 질통에 자갈을 담는 일꾼에게 말을 걸었다.</p>
+  <p class="dialogue">"배씨, 힘들어?"</p>
+  <p class="dialogue">"네. 힘들어요."</p>
+  <p class="dialogue">"음료수 좀 먹고 하지?"</p>
+  <p class="dialogue">"네."</p>
+  <p>배씨가 수건으로 땀을 닦고 음료수를 마셨다.</p>
+  <p class="dialogue">"곰빵 할 만해?"</p>
+  <p>배씨가 고개를 가로저었다.</p>
+  <p class="dialogue">"남들은 그 무거운 벽돌지게도 하루 종일 지고, 또 그 다음 그 다음 날에도 지더구먼."</p>
+  <p class="dialogue">"사장님 나, 내일부터는 이 곰빵 일 안 할래요?"</p>
+  <p class="dialogue">"왜?"</p>
+  <p class="dialogue">"너무 힘들어요."</p>
+  <p class="dialogue">"힘 있을 때 해요! 이 일, 딴 일 하는 거보다 간섭도 안 받고 돈도 많잖아?"</p>
+  <p class="dialogue">"……."</p>
+  <p class="dialogue">"한 살이라도 더 젊었을 때 해! 나이 먹으면 하고 싶어도 남들이 시키지도 않아요. 좀 좋지 않은 일도 해줘야지, 좋은 일 나왔을 때 그 일도 내보내주고 그러지. 그게 인지상정 아닌가?"</p>
+  <p>배씨가 무표정하게 고개만 끄덕였다.</p>
+  <p>방 안에서는 한선구가 올라온 자갈을 미장하기 좋도록 펴는 작업을 하고 있었다. 마을 사람 하나가 들여다보았다.</p>
+  <p class="dialogue">"아저씨, 안녕하세요?"</p>
+  <p class="dialogue">"네."</p>
+  <p class="dialogue">"난방시설 꼼꼼하게 잘 하십니다."</p>
+  <p class="dialogue">"네. 이렇게 해야만 겨울에 춥지 않아요."</p>
+  <p class="dialogue">"시공이 너무 간편하고 효율적입니다. 그래서 우리 집도 곧 수리하려고 합니다."</p>
+  <p class="dialogue">"집수리해서 사용하시면 넓고 편리해서 좋습니다."</p>
+  <p class="dialogue">"아저씨, 집수리도 하나요?"</p>
+  <p class="dialogue">"그럼요."</p>
+  <p class="dialogue">"인테리어도?"</p>
+  <p class="dialogue">"네. 저, 집수리가 전문인걸요."</p>
+  <p class="dialogue">"마침 잘 만났네요. 그동안 집수리를 하려고 해도 잘 한다는 사람 못 만났었거든요. 베란다 뜯어서 거실 확장하고, 다락 딸린 부엌 부숴서 방 하나 더 만들려고 합니다."</p>
+  <p class="dialogue">"그러면 좋지요. 제가 그런 거 하는 기계, 도구들을 다 갖고 있거든요."</p>
+  <p class="dialogue">"그럼 우리 집, 수리 좀 부탁합니다. 우리 집은 이 댐으로 흘러들어오는 강 초입에 있습니다."</p>
+  <p class="dialogue">"고맙습니다."</p>
+  <p>한선구가 주머니에서 명함을 꺼내주었다.</p>
+  <p>창문 밖으로 댐 물막이 공사장의 웅장한 옹벽이 보이는 자리에서, 덕배와 주승호가 아래쪽에서 자갈 곰빵을 하는 일꾼들을 내려다보았다.</p>
+  <p class="dialogue">"왜 저 자갈, 하이랜드로 올리지 않고……. 힘들고 시간 걸리지 않습니까?"</p>
+  <p class="dialogue">"하이랜드로 올리면 좋지요. 그렇지만 그렇게 장비를 이용하게 되면 저 곰빵 일 하는 사람들, 일거리가 없습니다."</p>
+  <p class="dialogue">"네?"</p>
+  <p class="dialogue">"그리고 또 이중일이 됩니다. 한곳에 쌓인 자갈을 각 방으로 옮겨놔야 되잖겠습니까?"</p>
+  <p class="dialogue">"일이 너무 늦어지는 거 같습니다. 그럼 미장도 기계미장 안 할 겁니까? 손 미장을 할 겁니까?"</p>
+  <p class="dialogue">"그건 기계미장 해야지요. 원래는 미장도 인력으로 하려고 시멘트 모래 준비했었지만, 지하실에 큰 보일러 제작 설치하는 바람에 그만 공기에 쫓기게 돼서……."</p>
+  <p class="dialogue">"그건 어쩔 수 없는 일 아닙니까? 숙소 사람들, 더운 물 쓰려면 보일러 설치는 당연한 일이지요."</p>
+  <p class="dialogue">"……."</p>
+  <p class="dialogue">"그럼, 쓰지 않는 저 모래 시멘트는 어떡할 겁니까?"</p>
+  <p class="dialogue">"기계미장해서 일만 빨리 끝마쳐준다면, 이 현장에서 모래 시멘트 다 쓴다고 합니다."</p>
+  <p class="dialogue">"누가 그럽니까?"</p>
+  <p class="dialogue">"저번에 박과장님과 말씀 나눴습니다."</p>
+  <p>주승호가 고개를 끄덕였다.</p>
+  <p class="dialogue">"어쨌든 일만 잘 마무리 지어 주세요."</p>
+  <p>아래 마당에서는 질통을 진 양씨가 떠나려는데 커피배달 아가씨가 지나다 멈춰 섰다.</p>
+  <p class="dialogue">"아저씨, 쉬면서 하세요."</p>
+  <p class="dialogue">"쉬면 안 돼."</p>
+  <p>양씨가 삼 층 창문 쪽을 올려다보았다. 아가씨도 따라 올려다보았다. 그 창문 앞에서 덕배와 주승호가 내려다보며 이야기하고 있었다.</p>
+  <p class="dialogue">"저 인력사장이 위에서 내려다보잖아?"</p>
+  <p class="dialogue">"그래도 쉬세요. 너무 힘들어 보여요."</p>
+  <p class="dialogue">"쉬면 모가지다. 모가지는 아니어도 일, 잘 안 내보내준다고."</p>
+  <p class="dialogue">"아이 아저씨, 불쌍해서 어떡해?"</p>
+  <p>양씨가 질통을 지고 건물 안으로 들어갔다. 빈 질통을 지고 나오던 허씨가 아가씨를 보았다.</p>
+  <p class="dialogue">"이 근처 다방 생겼어?"</p>
+  <p class="dialogue">"네."</p>
+  <p class="dialogue">"티켓다방이야?"</p>
+  <p class="dialogue">"아니요. 아주 큰 다방예요. 놀러들 오세요."</p>
+  <p>아가씨가 광고가 붙은 시원한 물병을 주었다.</p>
+  <p class="dialogue">"그 커피는 누가 시킨 거야?"</p>
+  <p class="dialogue">"사무실 사람들이 시켜서 왔어요."</p>
+  <p class="dialogue">"다방 어디 있어?"</p>
+  <p class="dialogue">"카바레 없어지고 그 자리에 다방 생겼잖아요?"</p>
+  <p class="dialogue">"경찰서장이 하던 카바레?"</p>
+  <p class="dialogue">"네. 그렇다나 봐요."</p>
+  <p class="dialogue">"그럼 거기서 여기까지 배달 온다고?"</p>
+  <p class="dialogue">"차로 배달하는데 뭐가 멀어요? 커피 남은 거 있는데 좀 따라 드릴까요?"</p>
+  <p>허씨가 다이 쪽으로 걸음을 옮겼다.</p>
+  <p class="dialogue">"아니야, 우리 일 해야 돼."</p>
+  <div class="section-num">2</div>
+  <p>시골 장터 어느 밥집 앞에 승용차와 승합차가 섰다. 덕배와 한선구가 승용차에서 내리고 일꾼들이 승합차에서 내렸다. 안에서는 몇몇 사람들이 식사를 하고 있었고, 카운터 앞의 조형사 부인이 문을 열고 들어서는 손님들을 보았다.</p>
+  <p class="dialogue">"어서 오세요."</p>
+  <p class="dialogue">"아주머니 안녕하세요?"</p>
+  <p class="dialogue">"어! 인력 사장님께서 어쩐 일로……?"</p>
+  <p class="dialogue">"식사하러 왔습니다."</p>
+  <p class="dialogue">"잘 오셨습니다."</p>
+  <p class="dialogue">"그래 조형사님한테서는 좋은 소식 있습니까?"</p>
+  <p class="dialogue">"경찰에서 석방시키기로 했다나 봅니다. 사건은 많고 일꾼은 적다고, 서에는 조형사가 있어야 된다나 봅니다."</p>
+  <p class="dialogue">"너무 잘 됐네요."</p>
+  <p class="dialogue">"……."</p>
+  <p class="dialogue">"손님들이 많은데요."</p>
+  <p class="dialogue">"시장이라 사람들, 좀 있어요. 일행이신가요?"</p>
+  <p class="dialogue">"네."</p>
+  <p class="dialogue">"그러면 이쪽으로 앉으세요."</p>
+  <p>창문 쪽 붙은 식탁으로 일꾼들이 자리를 잡았다.</p>
+  <p class="dialogue">"조형사님이 이 집에서도 식사 좀 하라고 해서."</p>
+  <p class="dialogue">"그래요?"</p>
+  <p class="dialogue">"네."</p>
+  <p class="dialogue">"그러면 우리 집에 일꾼들 좀 보내주세요. 우리 집은 좀 번거롭지만 생선 직접 굽고 국도 바로 끓이고 그래요. 냉장고에서 반찬 꺼내드리지 않아요."</p>
+  <p class="dialogue">"그렇게 해서 이가 남습니까?"</p>
+  <p class="dialogue">"시장사람들에겐 따듯한 게 좋아요. 그 분들, 하루 종일 밖에서 살잖아요."</p>
+  <p class="dialogue">"내가 일 맡음, 업자들 데리고 오지요."</p>
+  <p class="dialogue">"그러시면 고맙지요. 밥만 팔아서는 매상 안 오릅니다. 우리 집, 탕도 잘하고 구이도 잘해요."</p>
+  <p class="dialogue">"그래, 경찰서 사람들은 좀 와 보나요?"</p>
+  <p class="dialogue">"그럼요. 그 사람들도 가끔 와서 팔아줘요. 그렇지만 우리 남편 출소하면 이 식당도 그만둘 거예요."</p>
+  <p>식당아줌마가 다가왔다.</p>
+  <p class="dialogue">"아저씨들, 뭐 드실 겁니까?"</p>
+  <p>일꾼들이 메뉴판을 보았다.</p>
+  <p class="dialogue">"자들, 마음껏 실컷 들어요. 곰빵 내일도 해야 합니다."</p>
+  <p class="dialogue">"아무거나 요!"</p>
+  <p>허씨가 소리쳤다.</p>
+  <p class="dialogue">"아무거나 라면 다른 식당에서는 재활용음식들 준다던데요."</p>
+  <p class="dialogue">"우리 식당에서는 제일 좋은 걸로 해서 드립시다."</p>
+  <p>일꾼들이 환하게 웃었다.</p>
+  <div class="section-num">3</div>
+  <p>경찰 복지회관 건축현장은 주위에 가림막이 둘러쳐진 채 골조공사 중이었다. 이 층 골조가 올라가고 삼 층 골조 거푸집을 세우고 있었다. 경찰서장과 수사과장이 건물을 둘러보다가 상판 위에서 거푸집을 세우는 목수들과 말을 나누었다.</p>
+  <p class="dialogue">"수고들 하십니다."</p>
+  <p class="dialogue">"서장님, 수사과장님, 오랜만에 오셨습니다."</p>
+  <p class="dialogue">"그동안 바빠서 들여다보지 못했더니……."</p>
+  <p class="dialogue">"……."</p>
+  <p class="dialogue">"일, 늦는 거 맞지요?"</p>
+  <p class="dialogue">"네. 속도가 느렸습니다."</p>
+  <p class="dialogue">"업자들이 왜 이럽니까?"</p>
+  <p class="dialogue">"자기 일을 남의 일처럼 하나 보지요?"</p>
+  <p class="dialogue">"남의 일이잖아요?"</p>
+  <p class="dialogue">"어떻게 남의 일입니까? 자기가 맡아서 하면 그게 바로 자기 일이지."</p>
+  <p class="dialogue">"서장님. 그래도 내가 여기서 일할 때는 놀지 않은 겁니다. 그때는 공사 진척 빨랐습니다."</p>
+  <p class="dialogue">"목수 아저씨."</p>
+  <p class="dialogue">"네."</p>
+  <p class="dialogue">"요즈음도 목수 분들 부족합니까?"</p>
+  <p class="dialogue">"목수들은 많습니다."</p>
+  <p class="dialogue">"그런데 목수들이 없어서 일 못 하겠다는 소리는 뭡니까?"</p>
+  <p class="dialogue">"댐 골조공사를 맡은 영진건설 유사장이 일, 여기저기 벌려놓다 보니, 한두 군데에서 돈 잘 안 나오면 그 영향 여기까지 미칩니다."</p>
+  <p class="dialogue">"우리는 목수 분들께 돈, 그날그날 직접 다 드리잖아요?"</p>
+  <p class="dialogue">"네. 맨 처음엔 유사장, 그거 때문에 깽판까지 친걸요."</p>
+  <p>두 사람이 말을 잃었다.</p>
+  <p class="dialogue">"이 현장, 돈 잘 준다는 소문만 번지면 일에는 차질 없을 겁니다."</p>
+  <p class="dialogue">"그럴까요?"</p>
+  <p class="dialogue">"네."</p>
+  <p class="dialogue">"그래야지요. 우린, 수사 때문에 여기까지 신경 쓸 새가 없어요."</p>
+  <p class="dialogue">"여기서는 돈 때문에 걱정 마십시오. 관급공사라 틀림없는 곳입니다. 또 우리가 시내에서 사용하던 사무실 돈도 뽑아 이 공사에다 넣었으니까, 이 집 일하면서 돈 걱정일랑 마십시오."</p>
+  <p class="dialogue">"댐도 관급공사인데 왜 거기서는 돈, 잘 안 나옵니까?"</p>
+  <p class="dialogue">"거기도 돈 잘 안 나온다고요?"</p>
+  <p class="dialogue">"그렇다나 봐요."</p>
+  <p class="dialogue">"거기는 말로는 국책사업이라 해도 합자회사나 다름없습니다. 민간투자자들도 있잖습니까?"</p>
+  <p class="dialogue">"아, 그래서 거기 가끔 돈들이 늦게 나와서 요즈음 일이 늦어지는군요. 까딱 잘못하다간 댐 작업도 일시 중단될지도 모른다네요."</p>
+  <p class="dialogue">"무슨 일이 시작한 지 얼마 되지도 않았는데 그래?"</p>
+  <p>수사과장이 목소리를 낮추어 귓속말을 했다.</p>
+  <p class="dialogue">"서장님, 우리 한번 이 기회에 댐 회사도 수사해 볼까요?"</p>
+  <p class="dialogue">"댐 회사 사정으로 돈 늦게 나오는 걸 우리가 무슨 권한으로 수사를 해요. 수사과장, 목 잘리고 싶어서 그래요? 그 사람들 때문에 우리가 복지회관 건물 짓는 건데."</p>
+  <p class="dialogue">"우리가 그때 이 복지회관 지을 때 댐 공사장서 유사장을 만나서 부탁하지 말았어야 했는데요. 이제 댐 현장 사람들이 우리에게 반격해 오면 어쩌지요?"</p>
+  <p class="dialogue">"그건 유사장 욕심이었어. 그 사람, 돈도 별로 없었으면서 왜 일을 그렇게 많이 맡아서 해. 그 사람, 돈 돌려막기 하다가 펑크 난 거지. 그 사람, 일꾼 돌려막기 하다가 낭패 본 거지."</p>
+  <p>수사과장이 고개를 끄덕였다.</p>
+  <p class="dialogue">"이 건축업자, 사람들 말로는 우리 일만 아니었더라도 근근이 버텨나갈 수 있었다는데……. 서과장?"</p>
+  <p class="dialogue">"네."</p>
+  <p class="dialogue">"기운 내! 우리 잘못이 아니라 유사장 욕심 때문이었으니까."</p>
+  <p>그때 목수의 휴대폰이 울렸다.</p>
+  <p class="dialogue">"네. 네? 유사장이 도망갔다고요? 댐에 목수들도 대주지 못하고 도망갔다고요?"</p>
+  <p class="dialogue">"유사장이 도망감 어떡해? 가뜩이나 바빠 죽겠는데…… 한 사람이 어딘데……."</p>
+  <p>목수가 전화를 끊고 두 사람 옆으로 왔다.</p>
+  <p class="dialogue">"유사장, 한쪽에서 공사비를 못 받게 됐답니다. 그렇게 되자 양쪽 공사비를 충당치 못해 돈을 받고 그대로 사라졌나 봅니다. 유사장, 어떻게든 살아보려고 교회수리공사 수주도 시도해봤지만 실패했답니다."</p>
+  <p>두 사람이 아무 말도 하지 못했다.</p>
+  <p class="dialogue">"그래도 목수는 얼마든지 있습니다. 이 경찰 복지회관, 돈 잘 주는 곳이니까 내가 여기저기 선전해드리죠."</p>
+  <p>서장과 수사과장이 씁쓸하게 현장을 돌아섰다.</p>
+  <div class="section-num">4</div>
+  <p>댐 숙소 방 안, 한선구가 호바로 자갈을 덮고 있는데 목사가 들어왔다.</p>
+  <p class="dialogue">"한선구씨, 일하시네요."</p>
+  <p class="dialogue">"목사님 오셨어요?"</p>
+  <p class="dialogue">"네. 자갈 일, 힘들겠습니다."</p>
+  <p class="dialogue">"자갈, 저 밑에서 예까지 등짐 지고 올라오는 사람들도 있는데요."</p>
+  <p class="dialogue">"그래, 선미씨는 잘 있나요?"</p>
+  <p class="dialogue">"네. 저번에 한번 서울 있는 고향청년들과 같이 여성의 집 갔다 왔었습니다."</p>
+  <p class="dialogue">"잘 하셨네요. 나도 거기 한번 갈 일 있어서 곧 가 볼 겁니다."</p>
+  <p class="dialogue">"목사님이 그 여성의 집에 무슨 볼일 있습니까?"</p>
+  <p class="dialogue">"내가 선미씨 그쪽에다 소개했잖습니까? 그랬더니 그쪽서 설교 한번 해달라고 해서요."</p>
+  <p class="dialogue">"하여튼 목사님, 고맙습니다. 불쌍한 우리 선미 보살펴 주셔서요. 그런데 목사님 여긴 웬일로 오셨습니까?"</p>
+  <p class="dialogue">"……."</p>
+  <p class="dialogue">"구경 오셨습니까?"</p>
+  <p class="dialogue">"한선구씨, 이 일 곧 끝나지요?"</p>
+  <p class="dialogue">"네."</p>
+  <p class="dialogue">"우리 교회 수리 좀 부탁드립니다."</p>
+  <p class="dialogue">"교회수리라면 공사가 클 텐데요."</p>
+  <p class="dialogue">"교회 다시 지을 거라서 그렇게 대대적인 수리는 안 할 겁니다. 교회수리 하실 수 있지요?"</p>
+  <p class="dialogue">"네. 목사님이 해달라고 그러시면 해드려야지요."</p>
+  <p class="dialogue">"참, 저번에 댐 옹벽공사를 맡은 유사장이 교회수리 한다는 소식 듣고, 교회수리 자기가 하겠다고 자기 달라고 하더라고요."</p>
+  <p class="dialogue">"그래서요?"</p>
+  <p class="dialogue">"우리도 그 사람에 대한 정보가 입수돼서 그 사람 일 안 주기로 했어요."</p>
+  <p class="dialogue">"잘 하셨어요. 그 분, 얼마 전까지는 말 그대로 유능해서 그 사람에게 교회수리를 맡겼더라면 좋았을 텐데…… 했을 겁니다. 그러나 그래도 그 분, 교회수리 같은 일은 맡지도 않을 사람이었는데……. 하여튼 고맙습니다."</p>
+  <p class="dialogue">"뭐가요?"</p>
+  <p class="dialogue">"그 교회수리 일, 제게 돌아와서요."</p>
+  <div class="section-num">5</div>
+  <p>대신인력 사무실에서 덕배가 장부를 정리하는데 전화가 울렸다.</p>
+  <p class="dialogue">"여보세요."</p>
+  <p class="dialogue">"주기사님."</p>
+  <p>댐건설회사 사무실에서 주승호가 수화기를 들고 있었다.</p>
+  <p class="dialogue">"그 인력에 목수들 많습니까?"</p>
+  <p class="dialogue">"네."</p>
+  <p class="dialogue">"댐에서 일할 목수, 확보해주세요."</p>
+  <p class="dialogue">"네?"</p>
+  <p class="dialogue">"목수 확보 할 수 있지요?"</p>
+  <p class="dialogue">"그럼요."</p>
+  <p class="dialogue">"영진건설 유사장, 아무래도 이상해요."</p>
+  <p class="dialogue">"왜요?"</p>
+  <p class="dialogue">"유사장이 일 맡아하던 데서 돈 받지 못해 도망갔나 봐요."</p>
+  <p class="dialogue">"그럼 난, 그 사람한테 돈 뜯겼네요. 이를 어쩌지요?"</p>
+  <p class="dialogue">"많이 물렸습니까?"</p>
+  <p class="dialogue">"많이 됩니다."</p>
+  <p class="dialogue">"저―, 강사장님, 유사장과의 관계는 다음에 생각하시고요. 지금 당장 우리한테 목수들 대 주겠습니까?"</p>
+  <p class="dialogue">"……."</p>
+  <p class="dialogue">"장사, 밑진 건 밑진 거고, 또 이 남는 자리가 나왔으면 잡아야지요. 안 그렇습니까?"</p>
+  <p class="dialogue">"목수 인건비, 회사에서 책임져 주는 게 확실하다면 대드리지요. 대드려야지요."</p>
+  <p>수화기를 내려놓은 덕배가 장부를 한참 들여다보았다. 물린 돈은 그 자리에 그대로 있었고, 새 일은 그 위에 얹혀 왔다.</p>
+  <div class="section-num">6</div>
+  <p>댐 숙소 앞, 한선구가 곰빵 일꾼들과 함께 쉬고 있었다.</p>
+  <p class="dialogue">"일들 하는 거 보면 힘들 참 좋습니다."</p>
+  <p class="dialogue">"힘은 일 안 하는 사람들이 더 좋지요. 우린 맨날 일하느라고 골병들어서 힘없어요. 살려니 어쩔 수 없이 하는 겁니다."</p>
+  <p class="dialogue">"돈이 없어서 이 일 하는 거지, 돈 좀 있음 이 힘든 일 누가 합니까? 이 등짐 하루 지고 나면 집에 가서 몸 아파 죽을 지경입니다. 그럴 때면 꼭 깡패한테 뚜드려 맞은 기분입니다."</p>
+  <p class="dialogue">"생각해보세요. 그 무거운 거를 하루 종일 계단 타고 오르락내리락 하니 힘, 안 들겠어요?"</p>
+  <p class="dialogue">"기술이나 기능, 배우지 그래요."</p>
+  <p class="dialogue">"이걸로 나간다면 몰라도, 지금 일 없어서 잠시 노느니 이 일이라도 하는 겁니다."</p>
+  <p>한선구가 고개를 끄덕였다. 그때 이혜자가 다가왔다.</p>
+  <p class="dialogue">"한선구씨, 여기서 일하세요?"</p>
+  <p class="dialogue">"어떻게 여기까지……?"</p>
+  <p>두 사람이 서로 손을 마주 잡았다.</p>
+  <div class="section-num">7</div>
+  <p>댐 회사 회의실, 앞쪽 벽면에 대형 모니터 화면이 매달리고 한쪽 벽면에는 댐 조감도와 공사현장사진과 안전포스터가 붙어 있었다. 바닥에는 댐 모형건축물이 설치되어 있고, 한편 구석에는 측량기기와 설계도면 책들과 안전모와 삽과 줄자가 놓여 있었다. 원형 테이블에 댐사장과 박과장과 주승호와 권진호가 둘러앉아 캔 음료를 마셨다.</p>
+  <p class="dialogue">"골조 유사장이 도망갔다면서요?"</p>
+  <p class="dialogue">"그랬다네요."</p>
+  <p class="dialogue">"우리는 손해 본 거 없습니까?"</p>
+  <p class="dialogue">"우리야 손해 본 거 없습니다. 있다면 앞으로 일하는데 목수가 없어서 그 영향 받을 겁니다."</p>
+  <p class="dialogue">"목수 걱정은 하지 않으셔도 됩니다. 제가 대신인력 강덕배 사장에게 말해놨습니다. 목수 확보해달라고요."</p>
+  <p class="dialogue">"그러니까 뭐래요? 대준답디까?"</p>
+  <p class="dialogue">"네. 대준답니다."</p>
+  <p class="dialogue">"그 인력도 유사장에게 돈 뜯겼을 텐데……."</p>
+  <p class="dialogue">"돈, 뜯겼답니다. 뜯겨도 많이 뜯겼답니다. 그래도 장사니까 어쩌겠습니까? 우리만 확실히 책임져준다면 목수 대주겠답니다."</p>
+  <p class="dialogue">"주기사, 수고 많았어요. 허지만 우리 댐 회사도 지금 긴축재정을 염두에 두고 일해야 됩니다."</p>
+  <p class="dialogue">"회사 사정 좋지 않습니까?"</p>
+  <p class="dialogue">"경영상의 문제점들이 여기저기서 속속 드러나고 있어요. 우리 회사가 그동안 퍼주기 식 공사를 해왔다니까요."</p>
+  <p class="dialogue">"유사장님은 어떻게 할 겁니까?"</p>
+  <p class="dialogue">"그분, 우리에게 직접적인 피해를 준 것도 아니고 보면 그냥 그대로 놔두십시다. 그 사람도 무던히 살려고 하던 사람인데 왜 그랬을까? 다만 우리가 염두에 둘 것은, 목수들이 일제히 바뀌면 그 사람들 오느라고 준비하는 시간도 있을 거고, 또 그 사람들 교육도 시키고 해야 하니까, 댐 공사는 당분간 잠시 중단될 거로 봅니다."</p>
+  <p class="dialogue">"목수 부문만 중단되는 거지 다른 파트는 계속 일해도 되잖습니까?"</p>
+  <p class="dialogue">"목수들이 일해 놓은 게 없는데 어떻게 다른 파트들이 일합니까?"</p>
+  <p>박과장이 대꾸하지 못했다. 한 사람이 사라지자 사백 미터 옹벽 위의 일이 통째로 멎게 되어 있었다.</p>
+  <div class="section-num">8</div>
+  <p>카바레가 있던 자리에 새로 생긴 다방, 음악이 흘렀다. 한선구와 이혜자가 들어서자 아가씨가 다가왔다.</p>
+  <p class="dialogue">"어서 오세요? 저쪽 안쪽으로 들어가세요."</p>
+  <p>두 사람이 안쪽 테이블에 앉자 아가씨가 주문을 받으러 왔다.</p>
+  <p class="dialogue">"뭐 드시겠습니까?"</p>
+  <p class="dialogue">"이혜자씨 뭐 하시겠습니까?"</p>
+  <p class="dialogue">"커피."</p>
+  <p class="dialogue">"그럼 커피 두 잔이요."</p>
+  <p class="dialogue">"네."</p>
+  <p>아가씨가 돌아서다가 다시 돌아보았다.</p>
+  <p class="dialogue">"아저씨는 댐 공사장서 오신 분 같다."</p>
+  <p class="dialogue">"그래요. 댐 숙소 짓는 데서 왔어."</p>
+  <p class="dialogue">"아아, 내가 아까 거기 차 배달하느라고 들렸었는데요."</p>
+  <p>아가씨가 돌아갔다.</p>
+  <p class="dialogue">"이혜자씨, 여긴 갑자기 어떻게 왔어요?"</p>
+  <p class="dialogue">"한선구씨가 보고 싶어서 왔지요. 같이 살기로 하니까 왠지 자꾸만 보고 싶은 거 있지요."</p>
+  <p class="dialogue">"……."</p>
+  <p class="dialogue">"일 많아요?"</p>
+  <p class="dialogue">"네."</p>
+  <p class="dialogue">"몸조심해서 하세요. 뭐니 뭐니 해도 건강이 제일예요. 건강 잃음 돈 한 푼도 못 번다는 거 잊지 마시고요."</p>
+  <p class="dialogue">"네. 그래 이혜자씨는 배구선수생활 지금도 하나요?"</p>
+  <p class="dialogue">"결혼하면 하지 않기로 했어요. 지금은 계약기간도 아직 남아있고 해서 일영훈련원에 계속 나가고 있어요."</p>
+  <p class="dialogue">"나, 이 일 끝나도 일 할 거 많이 있어요. 마을에서 어떤 분이 집수리 해달라고 하지요. 또 교회에서도 목사님이 교회수리 해달라고 하네요."</p>
+  <p class="dialogue">"일 많이 따서 좋네요. 돈 있어도 일 못 맡으면 김빠지는 일인데, 돈 없어도 할 일이 생겼다니 정말 좋네요. 그래 그 일 할 만큼의 돈, 여유는 있어요?"</p>
+  <p class="dialogue">"돈이요? 받아가며 해야지요."</p>
+  <p>아가씨가 커피를 놓고 갔다.</p>
+  <p class="dialogue">"궁상맞게 그렇게 그런 식으로 일하지 마세요."</p>
+  <p class="dialogue">"그럼 덕배 친구와 동업을 하든지 꾸든지 할 겁니다."</p>
+  <p class="dialogue">"덕배 친구가 누굽니까?"</p>
+  <p class="dialogue">"고향 불알친구예요. 여기서 인력공사 하는 사람인데, 지금 하고 있는 공사도 그 친구와 같이 동업하는 겁니다."</p>
+  <p class="dialogue">"앞으로는 그렇게 하지 마세요. 우리는 서로 결혼해 살기로 했잖아요."</p>
+  <p class="dialogue">"네."</p>
+  <p class="dialogue">"그럼 내가 돈 댈 테니 내 돈 갖다 쓰세요. 내가 전에 한선구씨에게 뭐랬어요? 우리 중견 건설업 하나 하자고 했잖아요."</p>
+  <p class="dialogue">"압니다. 그렇지만 지금 맡은 일들은 그 친구와 같이 해야 해요. 그 덕배 친구가 알면 날 배신자라고 할 겁니다."</p>
+  <p class="dialogue">"부인 될 사람이 돈 대겠다는데 그런 말이 어딨어요? 지금 그 사람은 인력공사라도 하는데, 그래 그런 친구가 선구씨가 이거 하는 것도 넘봐요?"</p>
+  <p class="dialogue">"그래도 이 산수마을 내려와서 일 해보라고 한 사람도 그 친구였고, 또 지금 맡아서 하는 일도 그 친구가 소개한 거고, 게다가 앞으로 할 일들도 지금 하는 일 때문에 들어온 일인데요."</p>
+  <p class="dialogue">"……."</p>
+  <p class="dialogue">"……."</p>
+  <p class="dialogue">"어쨌든 동업은 깨지게 돼 있다고요."</p>
+  <p>한선구가 떨떠름한 표정으로 커피잔을 들었다.</p>
+  <div class="section-num">9</div>
+  <p>그 무렵 유사장은 멀리서 뾰족탑이 선 교회를 바라보고 있었다.</p>
+  <p class="scene-break">― 교회에서 교회 수리하는 일만 줬더라도 나, 이렇게 도망 다닐 일은 없었을 텐데…….</p>
+  <p>간선도로 변 인도에서 가을 낙엽을 밟으며 걸을 때에도 같은 생각이 따라왔다.</p>
+  <p class="scene-break">― 그냥 목수로 있을 걸. 괜히 오야지는 한다고 고생만 많았지.</p>
+  <p>한강다리 난간에 서서 다리 밑으로 흘러가는 물을 내려다볼 때에도 그랬다.</p>
+  <p class="scene-break">― 그냥 오야지로 있을 걸. 괜히 단종업자 노릇하느라고 남들 좋은 일만 해줬지.</p>
+  <p>어느 술집 카운터 앞에서 와인을 마시며 그가 중얼거렸다.</p>
+  <p class="dialogue">"그냥 댐 골조 공사만 할 걸. 이 공사 저 공사 한다고 결국은 남들에게 피해만 입히고 이렇게 도망자 신세가 됐네."</p>
+  <p>모텔 방 침대에 누워서도 잠이 오지 않았다.</p>
+  <p class="scene-break">― 이제는 새로 시작해야지. 목수부터 새로 시작하는 거야. 젊은 목수들과 같이 일한다면 내가 그 사람들보다는 기술은 좋다 해도 힘에서 딸릴 텐데……. 이 유사장도 그 좋던 시절 다 지나갔구나. 그 좋던 시절 다시는 안 오겠지.</p>
+  <p>그가 침대 위에서 몸을 이리저리 뒤척였다.</p>
+  <div class="section-num">10</div>
+  <p>국립중앙박물관 건물 앞뜰, 돌계단을 올라서면 돌바닥이 넓게 펼쳐지고 많은 관람객들이 건물 안으로 들어갔다. 회의실 원탁에 박물관장과 문영모 과장과 홍보팀 직원 심진섭이 앉았다.</p>
+  <p class="dialogue">"제가 지난번 산수마을 천병진 기사 결혼식 갔을 때, 여기에도 왔다 갔었던 오명선 마을기자에게, 산수마을 물에 잠기기 전에 우리 박물관 유물 조사팀이 그곳으로 발굴하러 간다고 말했습니다."</p>
+  <p class="dialogue">"그 지역에 관한 역사적인 기록물, 옛 지도 등 문헌들을 참조해 본 결과, 그래도 그곳에서 옮길 만한 것들을 찾아내지 않았습니까?"</p>
+  <p class="dialogue">"이 기획유물 발굴 작업에 도움 줄 수 있는 향토사학가도 구했으면 좋겠습니다."</p>
+  <p>관장과 과장이 고개를 끄덕였다.</p>
+  <p class="dialogue">"그리고 우리 유적지 유물 발굴 조사단, 댐을 짓고 있는 수자원공사와도 의논하고 해야지요? 유적지, 고인돌을 옮기는 방안도 강구해보고요. 또 어디어디에다 절개지, 새 도로, 터널을 조성하고 있는지 그것도 알아보고, 알아보고 나면 우리도 그것을 토대로 할 일이 아주 많을 겁니다."</p>
+  <p class="dialogue">"큰 성과 올리고 오겠습니다."</p>
+  <p class="dialogue">"그래요. 옛것을 발견하고 보존하는 일은 새것을 발명하는 거에 버금가는 일이라는 걸 명심하고 현지로 출발하세요."</p>
+  <p class="dialogue">"네."</p>
+  <div class="section-num">11</div>
+  <p>산 밑, 국립박물관 유물조사 발굴 팀 사람들이 도착했다. 어떤 사람은 고문서와 옛 지도 사본을 들고 여기저기 살피며 오갔다. 명선이 따라다니며 사진을 찍었다.</p>
+  <p class="dialogue">"아저씨들, 여기 좀 한번 파보세요."</p>
+  <p class="dialogue">"네."</p>
+  <p>일꾼들이 삽으로 땅을 팠다.</p>
+  <p class="dialogue">"좀 이상한 것이 보이면 우리에게 말씀해주고 조심해서 파야 합니다. 지금 장비를 투입시키려고 해도 아직 초기 단계라 우선 삽으로 하는 겁니다."</p>
+  <p class="dialogue">"예, 알겠습니다."</p>
+  <p class="dialogue">"기획 발굴이라는데 여기에서 좋은 거라도 뭐 나올 가망이 있습니까?"</p>
+  <p class="dialogue">"고문헌과 옛 지도를 보면 이 자리에 뭐 있긴 있을 거 같습니다. 이렇게 자료를 활용해서 찾는 유물들이 고귀하고 가치가 있는 것들입니다. 허지만 변수라면, 세월이 많이 흐르다 보니 유물들이 자연의 변화로 유실됐다거나 도굴범에 의해 도난됐을 가능성도 배제치는 못합니다. 혹시 가망이 없다 해도 추측이 가면 땅을 파 봐야지요."</p>
+  <p class="dialogue">"발굴이 안 된다 해도 우리는 박물관에서 이곳으로 올 적에, 여기에서 하여야 할 일들을 정하고 왔기 때문에 그 일들을 다 해놓고 갈 겁니다."</p>
+  <p class="dialogue">"그 일들이 뭡니까?"</p>
+  <p class="dialogue">"아직까지도 옮기지 않고 방치해두었던 유적지와 고인돌을 옮기는 일입니다."</p>
+  <p class="dialogue">"그런 일들은 댐 건설이 시작되기 전에 다 이뤄졌어야 하는 게 아닙니까?"</p>
+  <p class="dialogue">"그렇지요. 그런데 수자원공사 측과 우리 박물관 측 사이에, 이 댐 지역을 조사해야 된다는 것에 대해 서로 행정적인 착오가 있었나 봅니다. 이곳에 댐이 들어서게 되면, 댐이 건설되기 전에 이 댐 지역에서 수몰될 수 있는 문화재, 유적지, 유물들은 미리 옮겨 놓는 게 상례인데요."</p>
+  <p class="dialogue">"그렇다면 이런 사실을 어느 한쪽이 통보하는 걸 유기시켰나 보네요? 아니면 통보받고도 묵살을 했다거나……."</p>
+  <p>두 사람이 대답하지 못했다.</p>
+  <p class="dialogue">"하여튼 늦게나마 조사를 하게 돼서 다행입니다. 까딱 잘못했다간 귀중한 역사적인 유물들이 수몰될 뻔했겠네요."</p>
+  <p class="dialogue">"네. 그렇습니다. 그래도 늦게나마 조사를 하게 된 동기도, 천병진 기사나 민기사가 발굴해서 신고한 그 출토품 유물 때문이었습니다."</p>
+  <p class="dialogue">"오명선씨."</p>
+  <p class="dialogue">"네."</p>
+  <p class="dialogue">"혹시 이 마을에 향토사학가라고, 이 마을을 연구하고 이 마을을 사랑하는 그런 사람 있습니까? 나이 좀 들고 하신 분으로……."</p>
+  <p class="dialogue">"이 마을에서는 그런 직함 가지고 있는 사람, 듣도 보도 못했습니다. 또 이 마을엔 노인들도 별로 없습니다. 왜요?"</p>
+  <p class="dialogue">"됐습니다. 그냥 그런 분이 계셨더라면 우리가 일하는 데 훨씬 수월할 거 같아서 물어본 거뿐입니다."</p>
+  <p>마을을 기억하는 노인이 없는 마을에서, 서울 사람들이 고문헌을 들고 땅을 파고 있었다.</p>
+  <div class="section-num">12</div>
+  <p>산기슭 밑에서는 철거 팀들이 여전히 산 밑의 풀과 나무를 제거하고 물에 잠길 땅을 깎아내고 있었다. 그들이 건너편 산 위에서 사람들이 오가는 것을 보았다.</p>
+  <p>발굴 현장에는 삽과 곡괭이로 파낸 자리가 제법 넓어져 있었고, 주변에는 파는 범위를 표시하는 횟가루 줄이 뿌려져 있었다. 털보아들이 올라와 보았다.</p>
+  <p class="dialogue">"아저씨들, 여기서 뭐 합니까?"</p>
+  <p class="dialogue">"황창식씨! 작업하다 말고 여긴 또 왜 올라왔어?"</p>
+  <p class="dialogue">"궁금해서 왔지. 그래, 댁들은 누구세요? 이 고향사람들입니까?"</p>
+  <p class="dialogue">"아 아닙니다. 우리는 이 수몰될 지역에 있는 각종 문화재들을 조사해서, 그 문화재들을 재난으로부터 보호하고 복원시키는 일을 하려고 국립중앙박물관에서 나온 사람들입니다. 그런데 댁은 누구십니까?"</p>
+  <p class="dialogue">"저, 저 아래 보이는 산기슭에서 불순물들을 제거하는 사람입니다."</p>
+  <p class="dialogue">"아하! 그러면 수자원공사 측으로부터 통보받은 거 없습니까?"</p>
+  <p class="dialogue">"무슨 통보요?"</p>
+  <p>그때 그의 휴대폰이 울렸다.</p>
+  <p class="dialogue">"네. 내일부터 일, 나오지 말라고요? 누가 그래요? 수자원공사 측에서요? 네. 국립박물관 사람들이 와서 일하는 바람에 우리 작업이 당분간 중지됐다고요? 네. 알겠습니다."</p>
+  <p>전화를 끊은 털보아들이 미친 듯이 산 아래로 뛰어 내려갔다. 문영모 일행이 그 뒷모습을 바라보며 웃었다.</p>
+  <div class="section-num">13</div>
+  <p>바닷가 이 층 횟집, 넓은 판유리 너머로 출렁이는 바다에 정박한 큰 선박과 출어를 기다리는 고깃배들, 바다 위를 낮게 떠다니는 갈매기 떼가 한눈에 들어왔다. 문영모와 심진섭과 작업자들이 홀에 들어서자 식당주인과 명선이 맞았다.</p>
+  <p class="dialogue">"또 오셨네요."</p>
+  <p class="dialogue">"어떻게 우리를 알아보시네요?"</p>
+  <p>주인이 웃었다. 아가씨들이 일행을 갈매기 방으로 안내했다.</p>
+  <p class="dialogue">"문과장님, 제가 서울 박물관 갔을 때 그랬지요. 다음에 내려오심 제가 한턱낸다고요?"</p>
+  <p class="dialogue">"네. 고맙습니다. 그런데 명선씨, 이거 마을신문기금에서 쓰는 겁니까?"</p>
+  <p class="dialogue">"아 아니요. 우리 집, 여러분들께 식사 한 끼 접대할 여력은 있습니다."</p>
+  <p class="dialogue">"바다냄새가 물씬 풍깁니다."</p>
+  <p class="dialogue">"이집, 맛있는 집인데 먼젓번에는 그 출토품 분실 사건 때문에 맛을 모르고 먹었었습니다. 오늘은 맛있게 먹을랍니다."</p>
+  <p>풍광 좋고 아늑한 갈매기 방은 사면 벽이 온통 통유리였다. 길쭉한 테이블 앞에서 술이 곁들여진 회 요리가 나왔다.</p>
+  <p class="dialogue">"이렇게 횟집에 와서 먹으면, 저 바닷가 시장에서 파는 거 직접 사서 해먹는 것보다 비싸기는 하지만, 그래도 여기서 이렇게 먹는 게 더 정갈하고 맛있고 기분 좋습니다."</p>
+  <p class="dialogue">"과장님, 지금 그걸 말씀이라고 하세요?"</p>
+  <p class="dialogue">"기자 양반에게 이렇게 대접받다 큰 코 다치는 건 아니겠지요?"</p>
+  <p class="dialogue">"과장님 코, 작아서 다칠 데도 없으니 안심하고 마음껏 드세요. 우리 지역에 오셨으니까 여러분들은 제 손님입니다."</p>
+  <p>일행이 고개를 끄덕이며 젓가락을 들었다.</p>
+  <p class="dialogue">"조형사, 민기사, 천기사, 다들 잘 있지요?"</p>
+  <p class="dialogue">"아니요. 지금은 민기사만 댐 지역에서 일합니다."</p>
+  <p class="dialogue">"그럼 다른 사람들은요?"</p>
+  <p class="dialogue">"조형사는 아직도 구치소에서 재판 계류 중에 있고요. 천기사는 신혼여행을 중국 처갓집 쪽으로 갔는데, 그 처가 쪽 요청에 따라 당분간 거기서 살기로 했대요. 천기사, 국제결혼을 잘한 건지 잘못한 건지 통 모르겠네요."</p>
+  <p class="dialogue">"그러시는 명선씨는 시집 안 가고 기자생활만 할 겁니까?"</p>
+  <p class="dialogue">"곧 갈 겁니다."</p>
+  <p class="dialogue">"그러셔야지요. 그래야 산수마을도 든든해지지요."</p>
+  <p class="dialogue">"듣고 보니 세월이 모든 사람들을 갈라놓기도 하고 그러는군요. 슬픕니다."</p>
+  <p>잠시 아무도 말을 하지 않았다.</p>
+  <p class="dialogue">"참 앞으로 우리, 장비 쓸 일도 있을 텐데 그때 민기사 와서 우리 일했음 하네요."</p>
+  <p class="dialogue">"그러시면 민기사님도 좋다 하겠지요. 이건 아직은 극비인데요. 민기사님, 산에서 일하다가 또 양귀비 밭을 발견했대요."</p>
+  <p class="dialogue">"그것도 그 사람, 운인가 봅니다. 하여튼 우리는 여기 온 이상 우리, 소기의 목적을 달성하고 갈 겁니다. 이번 우리가 여기 도착해서 수자원공사 측 사람들과도 만나봤는데, 그들도 법이 지금 우리가 하는 일과 일치하다면 우리를 최대한 돕겠답니다."</p>
+  <p class="dialogue">"잘 됐네요. 아무쪼록 선전을 부탁합니다."</p>
+  <div class="section-num">14</div>
+  <p>실향민촌 털보아저씨 집 안마당에서 부인이 햇볕에 말린 빨간 고추의 꼭지를 따고 있었다.</p>
+  <p class="dialogue">"벌써 김장준비 하세요?"</p>
+  <p class="dialogue">"미리 하나하나 준비해둬야 김장할 때 쉽지."</p>
+  <p class="dialogue">"집도 어머니가 틈틈이 매만지나 봐요?"</p>
+  <p class="dialogue">"왜, 집이 깨끗해 보이냐?"</p>
+  <p class="dialogue">"네."</p>
+  <p class="dialogue">"집과 마누라는 꾸미게 딸렸다."</p>
+  <p class="dialogue">"……."</p>
+  <p class="dialogue">"너, 산 밑마다 다니면서 산 정비작업 한다면서?"</p>
+  <p class="dialogue">"네. 수질정화 차원에서 댐에 물이 찼을 경우를 생각해서, 댐 지역이 물에 잠기기 전 물에 잠기면 썩게 될 물질들을 미리 제거하는 작업예요."</p>
+  <p class="dialogue">"그게 모두 산 밑 땅을 깎아내고 나무 베어내는 일일 텐데 얼마나 힘들겠어? 고생한다. 고생이 많다."</p>
+  <p class="dialogue">"고생보다도 일이 그런가 봐요. 요즈음은 여기저기서 이상한 일만 터지고 그래요. 제발 그러지 않았으면 좋을 텐데."</p>
+  <p class="dialogue">"이 세상에 평탄한 일만 있겠니? 이 세상에는 별의별 일들이 태산같이 많단다. 너, 건강 생각해서 집에 자주 들려라."</p>
+  <p class="dialogue">"네. 서울서 박물관 사람들이 이 지역에 있을지도 모르는 유물들을 발굴하러 내려와서, 우리는 집에서 며칠 쉬어야 해요."</p>
+  <p class="dialogue">"그 사람들이 왔는데 너희가 왜 쉬냐?"</p>
+  <p class="dialogue">"그거야 우리 같은 낮은 사람들이 알 수가 있나요? 높은 사람들 지시에 따라 움직이는 우리로써는 몰라요. 그냥 우리가 대충 알기로는 작업순서가 우리보다 그들이 먼저라는 겁니다."</p>
+  <p class="dialogue">"그렇겠다. 그들이 이곳을 작업해도 된다는 진단이 나와야, 너희들이 그 땅을 훼손시켜도 되는 거지."</p>
+  <p class="dialogue">"아버지, 요즈음도 댐 기계실 나가세요?"</p>
+  <p class="dialogue">"으응. 나가긴 한다만 건강 전만 못한 거 같아 안쓰럽다."</p>
+  <p class="dialogue">"어머니. 우리 이렇게 매일같이 일하는데, 우리에게도 언젠가는 좋은 일 생기겠지요?"</p>
+  <p class="dialogue">"그럼, 좋은 일 생기겠지. 꼭 생길 거다."</p>
+  <p class="dialogue">"저도 돈 모으고 있어요. 일만 하니까 돈 벌지요. 또 나가거나 쉴 새가 없으니까 돈, 쓸 데도 없어요."</p>
+  <p class="dialogue">"그래, 돈 모아야지. 지금 우리 처지에는 이 일 저 일 가릴 때도 아니고, 일 있으면 그저 닥치는 대로 해야만 사는 형국이다. 그렇지 않으면 후회할 거다."</p>
+  <p class="dialogue">"네."</p>
+  <div class="section-num">15</div>
+  <p>댐 숙소 앞에 콘크리트 펌프 카가 서 있었다. 레미콘 차량이 다가와 콘크리트를 쏟아 부으면, 건물 외벽을 타고 올라간 쇠파이프가 그것을 건물 안쪽으로 흘려보냈다. 다른 한쪽에서는 벽돌을 실은 큰 트럭이 들어오고 지게차가 벽돌 무더기를 다이째 건물 앞에 차근차근 내려놓았다.</p>
+  <p>방 안에서는 기계미장이 한창이었다. 자바래 호수를 든 콘크리트공이 자갈이 깔린 바닥에 콘크리트를 골고루 쏟아 붓고, 미장이가 크고 긴 고데로 그것을 살짝살짝 빨리빨리 문질렀다.</p>
+  <p>복도에서는 일꾼들이 바쁘게 움직였다. 자바래 호수 끝에 바께쓰를 대고 옆방으로 뛰어가는 콘크리트공은 쏟아져 넘치는 콘크리트를 감당치 못해, 복도와 온몸이 콘크리트 투성이였다. 덕배와 선구가 삽으로 그것을 퍼 담아 방 안쪽으로 집어넣었다. 그러다 서로 얼굴이 마주치면 피식 웃었다.</p>
+  <p>주승호가 허겁지겁 다가왔다.</p>
+  <p class="dialogue">"웬 회의가 그렇게 많은지 좀 늦었네요. 두 분, 사장님들 열심히 일하시네요?"</p>
+  <p>두 사람이 삽을 든 채 그를 보았다.</p>
+  <p class="dialogue">"기계미장하니까 좋지요? 기계미장 해야 일 빠르고 방바닥 깨끗하게 나와요."</p>
+  <p>돈은 늦게 나오고 사람은 도망가고 땅은 파헤쳐지는데, 방바닥만은 하루가 다르게 매끈하게 깔리고 있었다.</p>
           </div>
         </div>
         
@@ -1562,10 +1696,14 @@
     </div>
   </main>
 
-  <div id="toast-notify" class="fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-slate-900 text-white px-5 py-2.5 rounded-full text-xs font-semibold shadow-xl z-50 opacity-0 pointer-events-none transition-all duration-300"></div>
+  <div id="toast-notify" class="fixed bottom-24 left-1/2 transform -translate-x-1/2 bg-slate-900 text-white px-5 py-2.5 rounded-full text-xs font-semibold shadow-2xl z-50 opacity-0 pointer-events-none transition-all duration-300"></div>
 
   <script>
     (function() {
+      const currentChapFilename = "chapter-42.html";
+      const currentChapTitle = "제41장 도망간 사람";
+      const bookTitle = "댐";
+
       const progressBar = document.getElementById('progress-bar');
       const btnToggleToc = document.getElementById('btn-toggle-toc');
       const btnCloseToc = document.getElementById('btn-close-toc');
@@ -1574,80 +1712,47 @@
       const sidebarOverlay = document.getElementById('sidebar-overlay');
       const tocSearchInput = document.getElementById('toc-search-input');
       const tocListContainer = document.getElementById('toc-list-container');
+      
       const btnToggleSettings = document.getElementById('btn-toggle-settings');
-      const floatBtnSettings = document.getElementById('float-btn-settings');
       const settingsDropdown = document.getElementById('settings-dropdown');
-      const btnFontMinus = document.getElementById('btn-font-minus');
+      const floatBtnFontPlus = document.getElementById('float-btn-font-plus');
+      const floatBtnFontMinus = document.getElementById('float-btn-font-minus');
       const btnFontPlus = document.getElementById('btn-font-plus');
+      const btnFontMinus = document.getElementById('btn-font-minus');
       const fontSizeVal = document.getElementById('font-size-val');
+
+      const floatBtnTheme = document.getElementById('float-btn-theme');
+      const themePopover = document.getElementById('theme-popover');
+      const themeBtns = document.querySelectorAll('.theme-btn');
+      const popoverFontSerif = document.getElementById('popover-font-serif');
+      const popoverFontSans = document.getElementById('popover-font-sans');
       const fontBtnSerif = document.getElementById('font-btn-serif');
       const fontBtnSans = document.getElementById('font-btn-sans');
-      const themeBtns = document.querySelectorAll('.theme-btn');
-      const floatBtnTop = document.getElementById('float-btn-top');
+
       const btnBookmark = document.getElementById('btn-bookmark');
       const floatBtnBookmark = document.getElementById('float-btn-bookmark');
-      const toastNotify = document.getElementById('toast-notify');
-      const dockLeftWrapper = document.getElementById('dock-left-wrapper');
-      const dockRightWrapper = document.getElementById('dock-right-wrapper');
-      const readerViewport = document.getElementById('reader-viewport');
+      const dockBookmarkIcon = document.getElementById('dock-bookmark-icon');
+      const visualBookmarkRibbon = document.getElementById('visual-bookmark-ribbon');
+      const bookmarkBanner = document.getElementById('bookmark-banner');
+      const bookmarkBannerInfo = document.getElementById('bookmark-banner-info');
+      const btnGotoBookmark = document.getElementById('btn-goto-bookmark');
 
+      const toastNotify = document.getElementById('toast-notify');
       let currentFontSize = 17;
 
-      /* 스마트 충돌 감지 로직: 책 본문 영역(reader-viewport)과 플로팅 독이 겹치는지 실시간 감지 */
-      function checkDockOverlap() {
-        if (!readerViewport || !dockLeftWrapper || !dockRightWrapper) return;
-        
-        const bookRect = readerViewport.getBoundingClientRect();
-        const leftDockRect = dockLeftWrapper.getBoundingClientRect();
-        const rightDockRect = dockRightWrapper.getBoundingClientRect();
-
-        // 좌측 독이 책의 왼쪽 가장자리 안으로 침범했거나 마진이 10px 미만인 경우
-        const isLeftOverlapping = (leftDockRect.right + 10) >= bookRect.left;
-        // 우측 독이 책의 오른쪽 가장자리 안으로 침범했거나 마진이 10px 미만인 경우
-        const isRightOverlapping = (rightDockRect.left - 10) <= bookRect.right;
-
-        // 화면 폭이 좁거나 본문과 겹칠 때 .overlap-mode 클래스 토글
-        if (isLeftOverlapping || window.innerWidth < 860) {
-          dockLeftWrapper.classList.add('overlap-mode');
-        } else {
-          dockLeftWrapper.classList.remove('overlap-mode');
-        }
-
-        if (isRightOverlapping || window.innerWidth < 860) {
-          dockRightWrapper.classList.add('overlap-mode');
-        } else {
-          dockRightWrapper.classList.remove('overlap-mode');
-        }
-      }
-
-      window.addEventListener('resize', checkDockOverlap, { passive: true });
-      window.addEventListener('scroll', checkDockOverlap, { passive: true });
-      setTimeout(checkDockOverlap, 100);
-
-      // 모바일/터치 대응: 터치 시 3초간 선명하게 표시 후 다시 반투명화
-      [dockLeftWrapper, dockRightWrapper].forEach(dock => {
-        if (!dock) return;
-        dock.addEventListener('touchstart', () => {
-          dock.classList.add('touch-active');
-          clearTimeout(dock._touchTimer);
-          dock._touchTimer = setTimeout(() => {
-            dock.classList.remove('touch-active');
-          }, 3000);
-        }, { passive: true });
-      });
-
-      function showNotice(msg) {
-        if (!toastNotify) return;
-        toastNotify.textContent = msg;
-        toastNotify.classList.remove('opacity-0');
-        setTimeout(() => toastNotify.classList.add('opacity-0'), 2500);
-      }
-
+      /* 스크롤 진행 바 (하단 독은 상시 100% 선명하게 표시) */
       window.addEventListener('scroll', () => {
         const docHeight = document.documentElement.scrollHeight - window.innerHeight;
         const scrolled = (window.scrollY / (docHeight || 1)) * 100;
         if (progressBar) progressBar.style.width = Math.min(100, Math.max(0, scrolled)) + '%';
-      });
+      }, { passive: true });
+
+      function showNotice(msg) {
+        if (!toastNotify) return;
+        toastNotify.innerHTML = msg;
+        toastNotify.classList.remove('opacity-0');
+        setTimeout(() => toastNotify.classList.add('opacity-0'), 2800);
+      }
 
       function openToc() {
         sidebarToc.classList.remove('-translate-x-full');
@@ -1662,6 +1767,13 @@
       if (btnCloseToc) btnCloseToc.addEventListener('click', closeToc);
       if (sidebarOverlay) sidebarOverlay.addEventListener('click', closeToc);
 
+      if (btnToggleSettings) {
+        btnToggleSettings.addEventListener('click', (e) => {
+          e.stopPropagation();
+          settingsDropdown.classList.toggle('hidden');
+        });
+      }
+
       if (tocSearchInput) {
         tocSearchInput.addEventListener('input', (e) => {
           const val = e.target.value.toLowerCase().trim();
@@ -1673,16 +1785,31 @@
         });
       }
 
-      function toggleSettings() {
-        settingsDropdown.classList.toggle('hidden');
+      function setFontSize(delta) {
+        currentFontSize = Math.min(32, Math.max(13, currentFontSize + delta));
+        document.documentElement.style.setProperty('--font-size', currentFontSize + 'px');
+        if (fontSizeVal) fontSizeVal.textContent = currentFontSize + 'px';
+        showNotice('글자 크기: ' + currentFontSize + 'px');
       }
-      if (btnToggleSettings) btnToggleSettings.addEventListener('click', toggleSettings);
-      if (floatBtnSettings) floatBtnSettings.addEventListener('click', toggleSettings);
+
+      if (floatBtnFontPlus) floatBtnFontPlus.addEventListener('click', () => setFontSize(1));
+      if (floatBtnFontMinus) floatBtnFontMinus.addEventListener('click', () => setFontSize(-1));
+      if (btnFontPlus) btnFontPlus.addEventListener('click', () => setFontSize(1));
+      if (btnFontMinus) btnFontMinus.addEventListener('click', () => setFontSize(-1));
+
+      // 화면 스타일 팝오버 토글
+      if (floatBtnTheme) {
+        floatBtnTheme.addEventListener('click', (e) => {
+          e.stopPropagation();
+          themePopover.classList.toggle('hidden');
+        });
+      }
 
       document.addEventListener('click', (e) => {
-        if (settingsDropdown && !settingsDropdown.contains(e.target) &&
-            btnToggleSettings && !btnToggleSettings.contains(e.target) &&
-            floatBtnSettings && !floatBtnSettings.contains(e.target)) {
+        if (themePopover && !themePopover.contains(e.target) && floatBtnTheme && !floatBtnTheme.contains(e.target)) {
+          themePopover.classList.add('hidden');
+        }
+        if (settingsDropdown && !settingsDropdown.contains(e.target) && btnToggleSettings && !btnToggleSettings.contains(e.target)) {
           settingsDropdown.classList.add('hidden');
         }
       });
@@ -1697,55 +1824,127 @@
         });
       });
 
-      if (btnFontPlus) {
-        btnFontPlus.addEventListener('click', () => {
-          if (currentFontSize < 26) {
-            currentFontSize += 1;
-            document.documentElement.style.setProperty('--font-size', currentFontSize + 'px');
-            if (fontSizeVal) fontSizeVal.textContent = currentFontSize + 'px';
-            checkDockOverlap();
-          }
-        });
-      }
-      if (btnFontMinus) {
-        btnFontMinus.addEventListener('click', () => {
-          if (currentFontSize > 13) {
-            currentFontSize -= 1;
-            document.documentElement.style.setProperty('--font-size', currentFontSize + 'px');
-            if (fontSizeVal) fontSizeVal.textContent = currentFontSize + 'px';
-            checkDockOverlap();
-          }
-        });
-      }
-
-      if (fontBtnSerif) {
-        fontBtnSerif.addEventListener('click', () => {
+      // 명조/고딕 서체 확실한 전환 처리 함수
+      function applyFont(type) {
+        if (type === 'serif') {
+          document.body.classList.remove('font-mode-sans');
           document.documentElement.style.setProperty('--active-font', 'var(--font-family-serif)');
-          fontBtnSerif.classList.add('font-bold');
-          fontBtnSans.classList.remove('font-bold');
-          showNotice('명조체(Serif) 적용');
-        });
-      }
-      if (fontBtnSans) {
-        fontBtnSans.addEventListener('click', () => {
+          
+          if (popoverFontSerif) {
+            popoverFontSerif.className = 'py-1.5 rounded-md border border-indigo-600 bg-indigo-50/50 text-indigo-700 font-serif font-bold';
+            popoverFontSans.className = 'py-1.5 rounded-md border border-[var(--border-color)] font-sans';
+          }
+          if (fontBtnSerif) {
+            fontBtnSerif.className = 'py-2 rounded-lg border border-indigo-600 bg-indigo-50/50 text-indigo-700 font-serif font-bold';
+            fontBtnSans.className = 'py-2 rounded-lg border border-[var(--border-color)] font-sans';
+          }
+          showNotice('📖 명조체(Serif)로 변경되었습니다.');
+        } else {
+          document.body.classList.add('font-mode-sans');
           document.documentElement.style.setProperty('--active-font', 'var(--font-family-sans)');
-          fontBtnSans.classList.add('font-bold');
-          fontBtnSerif.classList.remove('font-bold');
-          showNotice('고딕체(Sans) 적용');
+
+          if (popoverFontSans) {
+            popoverFontSans.className = 'py-1.5 rounded-md border border-indigo-600 bg-indigo-50/50 text-indigo-700 font-sans font-bold';
+            popoverFontSerif.className = 'py-1.5 rounded-md border border-[var(--border-color)] font-serif';
+          }
+          if (fontBtnSans) {
+            fontBtnSans.className = 'py-2 rounded-lg border border-indigo-600 bg-indigo-50/50 text-indigo-700 font-sans font-bold';
+            fontBtnSerif.className = 'py-2 rounded-lg border border-[var(--border-color)] font-serif';
+          }
+          showNotice('📄 고딕체(Sans-serif)로 변경되었습니다.');
+        }
+      }
+
+      if (popoverFontSerif) popoverFontSerif.addEventListener('click', () => applyFont('serif'));
+      if (popoverFontSans) popoverFontSans.addEventListener('click', () => applyFont('sans'));
+      if (fontBtnSerif) fontBtnSerif.addEventListener('click', () => applyFont('serif'));
+      if (fontBtnSans) fontBtnSans.addEventListener('click', () => applyFont('sans'));
+
+      /* 책갈피 기능: 언제(시각) 어디까지(장/스크롤%) 읽었는지 기록 및 시각 표시 */
+      const BOOKMARK_KEY = 'novel_reading_bookmark_' + encodeURIComponent(bookTitle);
+
+      function loadBookmark() {
+        try {
+          const raw = sessionStorage.getItem(BOOKMARK_KEY);
+          if (!raw) return null;
+          return JSON.parse(raw);
+        } catch (e) {
+          return null;
+        }
+      }
+
+      function updateBookmarkDisplay() {
+        const bm = loadBookmark();
+        if (!bm) return;
+
+        // 현재 챕터와 책갈피 챕터가 동일한 경우 시각적 리본 및 활성 표시
+        if (bm.filename === currentChapFilename) {
+          if (visualBookmarkRibbon) {
+            visualBookmarkRibbon.classList.remove('hidden');
+            visualBookmarkRibbon.title = '책갈피: ' + bm.date + ' (' + bm.percent + '% 지점)';
+          }
+          if (floatBtnBookmark) floatBtnBookmark.classList.add('active-bookmark');
+          if (dockBookmarkIcon) dockBookmarkIcon.textContent = '❤️';
+        }
+
+        // 책갈피 안내 배너 표시
+        if (bookmarkBanner && bookmarkBannerInfo) {
+          bookmarkBanner.classList.remove('hidden');
+          bookmarkBannerInfo.textContent = bm.chapterTitle + ' · ' + bm.percent + '% 지점 (' + bm.date + ')';
+        }
+      }
+
+      function saveBookmark() {
+        const now = new Date();
+        const timeStr = now.toLocaleDateString('ko-KR') + ' ' + now.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' });
+        const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+        const percent = Math.round((window.scrollY / (docHeight || 1)) * 100);
+        const scrollPos = window.scrollY;
+
+        const bookmarkData = {
+          chapterTitle: currentChapTitle,
+          filename: currentChapFilename,
+          scrollY: scrollPos,
+          percent: percent,
+          date: timeStr
+        };
+
+        try {
+          sessionStorage.setItem(BOOKMARK_KEY, JSON.stringify(bookmarkData));
+        } catch(e) {}
+
+        if (visualBookmarkRibbon) {
+          visualBookmarkRibbon.classList.remove('hidden');
+        }
+        if (floatBtnBookmark) floatBtnBookmark.classList.add('active-bookmark');
+        if (dockBookmarkIcon) dockBookmarkIcon.textContent = '❤️';
+
+        if (bookmarkBanner && bookmarkBannerInfo) {
+          bookmarkBanner.classList.remove('hidden');
+          bookmarkBannerInfo.textContent = currentChapTitle + ' · ' + percent + '% 독서 중 (' + timeStr + ')';
+        }
+
+        showNotice('🔖 책갈피 저장 완료!<br><span class="text-amber-300 font-normal">' + currentChapTitle + ' (' + percent + '% 지점 · ' + timeStr + ')</span>');
+      }
+
+      if (btnBookmark) btnBookmark.addEventListener('click', saveBookmark);
+      if (floatBtnBookmark) floatBtnBookmark.addEventListener('click', saveBookmark);
+
+      if (btnGotoBookmark) {
+        btnGotoBookmark.addEventListener('click', () => {
+          const bm = loadBookmark();
+          if (!bm) return;
+          if (bm.filename === currentChapFilename) {
+            window.scrollTo({ top: bm.scrollY, behavior: 'smooth' });
+            showNotice('책갈피 위치(' + bm.percent + '%)로 이동했습니다.');
+          } else {
+            window.location.href = bm.filename;
+          }
         });
       }
 
-      if (floatBtnTop) {
-        floatBtnTop.addEventListener('click', () => {
-          window.scrollTo({ top: 0, behavior: 'smooth' });
-        });
-      }
-
-      function bookmarkNow() {
-        showNotice('🔖 현재 위치가 책갈피에 기록되었습니다.');
-      }
-      if (btnBookmark) btnBookmark.addEventListener('click', bookmarkNow);
-      if (floatBtnBookmark) floatBtnBookmark.addEventListener('click', bookmarkNow);
+      // 초기 책갈피 상태 렌더링
+      updateBookmarkDisplay();
     })();
   </script>
 </body>
