@@ -2,7 +2,8 @@
  * 소설 「댐」 홈페이지 — 방문자 수 + 방명록 백엔드 (Google Apps Script)
  *
  * 사용법
- *  1) 구글 시트를 새로 만들고, 메뉴 [확장 프로그램] → [Apps Script]를 엽니다.
+ *  1) 구글 시트의 [확장 프로그램] → [Apps Script]에서 열거나, script.google.com 에서 새 프로젝트를 만듭니다.
+ *     (단독 프로젝트이면 setup 실행 시 '댐 홈페이지 데이터' 시트가 드라이브에 자동 생성됩니다)
  *  2) 기본 코드(Code.gs)를 모두 지우고 이 파일 내용을 붙여 넣은 뒤 저장합니다.
  *  3) 위쪽 함수 선택 상자에서 setup 을 고르고 [실행] → 권한 허용.
  *     (시트에 '방문자', '방명록' 탭이 자동으로 만들어집니다)
@@ -27,8 +28,21 @@ var NAME_MAX = 20;
 var MSG_MAX = 500;
 var POSTS_PER_10MIN = 20; // 도배 방지: 10분 동안 전체 최대 글 수
 
+function ss_() {
+  // 시트에 붙어 있는 스크립트면 그 시트를, 단독 스크립트면 전용 시트를 만들어 사용
+  var active = null;
+  try { active = SpreadsheetApp.getActiveSpreadsheet(); } catch (e) {}
+  if (active) return active;
+  var props = PropertiesService.getScriptProperties();
+  var id = props.getProperty('SHEET_ID');
+  if (id) return SpreadsheetApp.openById(id);
+  var created = SpreadsheetApp.create('댐 홈페이지 데이터 (방문자·방명록)');
+  props.setProperty('SHEET_ID', created.getId());
+  return created;
+}
+
 function setup() {
-  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var ss = ss_();
   var v = ss.getSheetByName(VISIT_SHEET) || ss.insertSheet(VISIT_SHEET);
   if (v.getLastRow() === 0) {
     v.appendRow(['날짜', '방문수']);
@@ -43,6 +57,7 @@ function setup() {
   }
   var def = ss.getSheetByName('시트1') || ss.getSheetByName('Sheet1');
   if (def && ss.getSheets().length > 2 && def.getLastRow() === 0) ss.deleteSheet(def);
+  Logger.log('데이터 시트 주소: ' + ss.getUrl());
 }
 
 function today_() {
@@ -55,14 +70,14 @@ function json_(obj) {
 }
 
 function visitSheet_() {
-  var s = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(VISIT_SHEET);
-  if (!s) { setup(); s = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(VISIT_SHEET); }
+  var s = ss_().getSheetByName(VISIT_SHEET);
+  if (!s) { setup(); s = ss_().getSheetByName(VISIT_SHEET); }
   return s;
 }
 
 function bookSheet_() {
-  var s = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(BOOK_SHEET);
-  if (!s) { setup(); s = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(BOOK_SHEET); }
+  var s = ss_().getSheetByName(BOOK_SHEET);
+  if (!s) { setup(); s = ss_().getSheetByName(BOOK_SHEET); }
   return s;
 }
 
