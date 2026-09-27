@@ -64,6 +64,13 @@ function today_() {
   return Utilities.formatDate(new Date(), TZ, 'yyyy-MM-dd');
 }
 
+// 시트에 보이는 날짜(2026-09-27, 2026. 9. 27 등)를 yyyy-MM-dd 로 통일
+function dateKey_(v) {
+  var m = String(v).match(/(\d{4})\D+(\d{1,2})\D+(\d{1,2})/);
+  if (!m) return '';
+  return m[1] + '-' + ('0' + m[2]).slice(-2) + '-' + ('0' + m[3]).slice(-2);
+}
+
 function json_(obj) {
   return ContentService.createTextOutput(JSON.stringify(obj))
     .setMimeType(ContentService.MimeType.JSON);
@@ -85,18 +92,21 @@ function stats_(increment) {
   var s = visitSheet_();
   var t = today_();
   var last = s.getLastRow();
-  var rows = last > 1 ? s.getRange(2, 1, last - 1, 2).getValues() : [];
-  var total = 0, todayCount = 0, todayRow = -1;
+  var rows = last > 1 ? s.getRange(2, 1, last - 1, 2).getDisplayValues() : [];
+  var total = 0, todayCount = 0, todayRow = -1, todayRowCount = 0;
   for (var i = 0; i < rows.length; i++) {
-    var n = Number(rows[i][1]) || 0;
+    var n = Number(String(rows[i][1]).replace(/[^\d.-]/g, '')) || 0;
     total += n;
-    if (String(rows[i][0]) === t) { todayCount = n; todayRow = i + 2; }
+    if (dateKey_(rows[i][0]) === t) {
+      todayCount += n;
+      if (todayRow < 0) { todayRow = i + 2; todayRowCount = n; }
+    }
   }
   if (increment) {
     todayCount += 1;
     total += 1;
-    if (todayRow > 0) s.getRange(todayRow, 2).setValue(todayCount);
-    else s.appendRow([t, todayCount]);
+    if (todayRow > 0) s.getRange(todayRow, 2).setValue(todayRowCount + 1);
+    else s.appendRow(["'" + t, 1]);
   }
   return { today: todayCount, total: total, date: t };
 }
