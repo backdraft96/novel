@@ -30,8 +30,10 @@
         '<button type="button" class="ab-close" aria-label="오디오북 닫기">✕</button>' +
       '</div>' +
       '<div class="ab-frame-wrap"><p class="ab-loading">플레이어를 불러오는 중…</p></div>' +
-      '<p class="ab-msg">▶ 버튼을 누르면 재생됩니다. 재생하면서 아래로 내려 글을 함께 읽을 수 있습니다.</p>';
+      '<p class="ab-msg">▶ 버튼을 누르면 재생됩니다. 재생하면서 아래로 내려 글을 함께 읽을 수 있습니다.</p>' +
+      '<a class="ab-open" target="_blank" rel="noopener">📱 재생이 안 되면 여기를 눌러 구글 드라이브에서 듣기 ↗</a>';
     panel.querySelector('.ab-title').textContent = '🎧 ' + title;
+    panel.querySelector('.ab-open').href = 'https://drive.google.com/file/d/' + id + '/view';
     h2.insertAdjacentElement('afterend', panel);
 
     var frame = null;
