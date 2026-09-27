@@ -143,15 +143,15 @@
       border-top: 1px solid rgba(197, 160, 89, 0.3);
     }
 
-    /* 하단 통합 단일 플로팅 독 (스마트폰 화면 비율 반응형 최적화) */
+    /* 하단 통합 단일 플로팅 독 (화면 폭 비례 반응형: 스마트폰에서 크게, PC에서 적당히) */
     .bottom-float-dock-wrapper {
       position: fixed;
-      bottom: max(12px, env(safe-area-inset-bottom, 12px));
+      bottom: max(10px, calc(env(safe-area-inset-bottom, 0px) + 6px));
       left: 50%;
       transform: translateX(-50%);
       z-index: 45;
-      width: calc(100% - 16px);
-      max-width: 600px;
+      width: calc(100% - 12px);
+      max-width: 640px;
       opacity: 1 !important;
       visibility: visible !important;
       user-select: none;
@@ -164,8 +164,9 @@
       -webkit-backdrop-filter: blur(16px);
       border: 1.5px solid var(--float-border);
       box-shadow: 0 12px 36px -6px rgba(0, 0, 0, 0.28), 0 4px 12px rgba(0, 0, 0, 0.08);
-      border-radius: 20px;
-      padding: 5px 3px;
+      border-radius: clamp(18px, 5.5vw, 26px);
+      padding: clamp(4px, 1.4vw, 8px) clamp(2px, 0.8vw, 6px);
+      gap: clamp(0px, 0.5vw, 4px);
     }
 
     .dock-btn {
@@ -177,11 +178,12 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 7px 2px;
-      border-radius: 14px;
+      padding: clamp(6px, 1.8vw, 9px) 1px;
+      border-radius: clamp(12px, 3.6vw, 16px);
       flex: 1 1 0px;
       min-width: 0;
-      min-height: 52px;
+      /* 화면 폭에 비례해 버튼 높이가 커짐 (360px폭 ≈ 62px, 430px폭 ≈ 70px) */
+      min-height: clamp(58px, 16.5vw, 72px);
       position: relative;
       touch-action: manipulation;
       -webkit-tap-highlight-color: transparent;
@@ -192,69 +194,100 @@
       background-color: rgba(30, 58, 95, 0.15);
     }
 
-    .dock-btn:hover:not(.disabled) {
-      background-color: var(--accent);
-      color: #ffffff;
+    @media (hover: hover) {
+      .dock-btn:hover:not(.disabled) {
+        background-color: var(--accent);
+        color: #ffffff;
+      }
     }
 
     .dock-icon {
-      font-size: 1.25rem;
+      font-size: clamp(1.35rem, 6.2vw, 1.75rem);
       line-height: 1;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      margin-bottom: 3px;
+      margin-bottom: clamp(3px, 1vw, 5px);
+    }
+    /* A+ / A- 글자 아이콘도 함께 커지도록 (Tailwind text-sm 덮어쓰기) */
+    .dock-icon.text-sm {
+      font-size: clamp(1.05rem, 4.8vw, 1.35rem) !important;
+      line-height: 1 !important;
     }
 
     .dock-label {
-      font-size: 10.5px;
+      font-size: clamp(11px, 3.15vw, 13.5px);
       font-weight: 600;
-      line-height: 1.1;
-      letter-spacing: -0.03em;
+      line-height: 1.15;
+      letter-spacing: -0.04em;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
       max-width: 100%;
     }
 
-    /* 화면 폭에 따른 유동적 버튼 & 글자 크기 스케일링 */
-    @media (min-width: 480px) {
+    /* PC·태블릿: 과하게 커지지 않도록 고정 크기 */
+    @media (min-width: 640px) {
       .bottom-float-dock {
         padding: 7px 6px;
+        border-radius: 22px;
       }
       .dock-btn {
         padding: 8px 4px;
-        min-height: 56px;
+        min-height: 60px;
       }
       .dock-icon {
-        font-size: 1.35rem;
+        font-size: 1.45rem;
+      }
+      .dock-icon.text-sm {
+        font-size: 1.1rem !important;
       }
       .dock-label {
-        font-size: 11.5px;
+        font-size: 12px;
       }
     }
 
-    @media (max-width: 375px) {
+    /* 매우 좁은 화면(구형·폴드 접힘 등) */
+    @media (max-width: 340px) {
       .bottom-float-dock-wrapper {
-        width: calc(100% - 10px);
-        bottom: max(8px, env(safe-area-inset-bottom, 8px));
-      }
-      .bottom-float-dock {
-        padding: 4px 1px;
-      }
-      .dock-btn {
-        padding: 6px 1px;
-        min-height: 48px;
-        border-radius: 11px;
-      }
-      .dock-icon {
-        font-size: 1.15rem;
-        margin-bottom: 2px;
+        width: calc(100% - 6px);
       }
       .dock-label {
-        font-size: 9.5px;
-        letter-spacing: -0.05em;
+        font-size: 10px;
+        letter-spacing: -0.06em;
       }
+    }
+
+    /* 스마트폰 가로 모드: 세로 공간이 좁으므로 낮고 얇게 */
+    @media (max-height: 500px) and (orientation: landscape) {
+      .bottom-float-dock-wrapper {
+        max-width: 560px;
+        bottom: max(6px, env(safe-area-inset-bottom, 6px));
+      }
+      .dock-btn {
+        min-height: 46px;
+        padding: 4px 2px;
+      }
+      .dock-icon {
+        font-size: 1.2rem;
+        margin-bottom: 2px;
+      }
+      .dock-icon.text-sm {
+        font-size: 0.95rem !important;
+      }
+      .dock-label {
+        font-size: 10.5px;
+      }
+    }
+
+    /* 본문 하단 여백: 커진 독에 글이 가려지지 않도록 */
+    main {
+      padding-bottom: calc(clamp(58px, 16.5vw, 72px) + 60px + env(safe-area-inset-bottom, 0px)) !important;
+    }
+
+    /* 알림 토스트가 커진 독 위에 뜨도록 */
+    #toast-notify {
+      bottom: calc(clamp(58px, 16.5vw, 72px) + 34px + env(safe-area-inset-bottom, 0px)) !important;
     }
 
     .dock-btn.disabled {
@@ -1229,7 +1262,7 @@
       <!-- 1. 처음으로 -->
       <a href="cover.html" class="dock-btn" title="처음으로 (표지)">
         <span class="dock-icon">🏠</span>
-        <span class="dock-label">처음으로</span>
+        <span class="dock-label">처음</span>
       </a>
 
       <!-- 2. 목차 -->
@@ -1977,5 +2010,6 @@
       updateBookmarkDisplay();
     })();
   </script>
+  <script src="site-config.js" defer></script>
 </body>
 </html>
