@@ -1792,7 +1792,10 @@
       const btnGotoBookmark = document.getElementById('btn-goto-bookmark');
 
       const toastNotify = document.getElementById('toast-notify');
-      let currentFontSize = 17;
+      let currentFontSize = (function () {
+        try { const v = parseInt(localStorage.getItem('dam_font_size'), 10); return v >= 13 && v <= 32 ? v : 17; } catch (e) { return 17; }
+      })();
+      document.documentElement.style.setProperty('--font-size', currentFontSize + 'px');
 
       /* 스크롤 진행 바 (하단 독은 상시 100% 선명하게 표시) */
       window.addEventListener('scroll', () => {
@@ -1839,12 +1842,17 @@
         });
       }
 
-      function setFontSize(delta) {
-        currentFontSize = Math.min(32, Math.max(13, currentFontSize + delta));
+      function setFontSize(delta, absolute) {
+        const next = typeof absolute === 'number' ? absolute : currentFontSize + delta;
+        currentFontSize = Math.min(32, Math.max(13, Math.round(next)));
         document.documentElement.style.setProperty('--font-size', currentFontSize + 'px');
         if (fontSizeVal) fontSizeVal.textContent = currentFontSize + 'px';
+        try { localStorage.setItem('dam_font_size', String(currentFontSize)); } catch (e) {}
         showNotice('글자 크기: ' + currentFontSize + 'px');
       }
+      // 두 손가락 확대(pinch-text.js)에서 사용
+      window.damSetFontSize = function (px) { setFontSize(0, px); };
+      if (fontSizeVal) fontSizeVal.textContent = currentFontSize + 'px';
 
       if (floatBtnFontPlus) floatBtnFontPlus.addEventListener('click', () => setFontSize(1));
       if (floatBtnFontMinus) floatBtnFontMinus.addEventListener('click', () => setFontSize(-1));
@@ -2013,6 +2021,7 @@
       }, { passive: true });
     })();
   </script>
+  <script src="pinch-text.js" defer></script>
   <script src="float-fix.js" defer></script>
   <script src="site-config.js" defer></script>
   <script src="audiobook-map.js" defer></script>
