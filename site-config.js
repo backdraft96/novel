@@ -6,7 +6,7 @@
  * 예) 'https://script.google.com/macros/s/AKfy..../exec'
  */
 window.DAM_SITE = {
-  API_URL: ''
+  API_URL: 'https://script.google.com/macros/s/AKfycbzs1CILpgGSJucGkP8SKrnfBuu8iswLt8rW_vsT2jeMxOH7N5RxJr3jP3vaxtMEZyyg/exec'
 };
 
 /* 방문자 집계: 한 브라우저당 하루 1회만 집계 (어느 페이지로 들어와도 동일) */
