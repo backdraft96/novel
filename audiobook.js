@@ -30,7 +30,7 @@
         '<button type="button" class="ab-close" aria-label="오디오북 닫기">✕</button>' +
       '</div>' +
       '<div class="ab-frame-wrap"><p class="ab-loading">플레이어를 불러오는 중…</p></div>' +
-      '<p class="ab-msg">▶ 버튼을 누르면 재생됩니다. 재생 중에도 화면을 내려 글을 함께 읽을 수 있습니다.</p>';
+      '<p class="ab-msg">▶ 버튼을 누르면 재생됩니다. 재생하면서 아래로 내려 글을 함께 읽을 수 있습니다.</p>';
     panel.querySelector('.ab-title').textContent = '🎧 ' + title;
     h2.insertAdjacentElement('afterend', panel);
 
